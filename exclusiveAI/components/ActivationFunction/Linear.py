@@ -1,6 +1,7 @@
 import numpy as np
 import ActivationFunction
 
+
 class Linear(ActivationFunction):
     def __init__(self):
         super().__init__()
@@ -10,6 +11,6 @@ class Linear(ActivationFunction):
 
     def __str__(self):
         return self.name
-    
+
     def __call__(self, x):
         return self.function(x)
