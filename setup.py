@@ -6,5 +6,5 @@ setup(
     version='0.0.1',
     description='A simple neural network library',
     author='Francesco Paolo Liuzzi & Paul Maximilian Magos',
-    test_suite='eclusiveAITest',
+    test_suite='exclusiveAITest',
 )

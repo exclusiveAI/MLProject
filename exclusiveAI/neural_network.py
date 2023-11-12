@@ -1,3 +1,5 @@
+import components.ActivationFunction 
+import components.LossFunction
 
 import numpy as np
 class neural_network:
