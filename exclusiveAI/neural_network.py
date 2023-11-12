@@ -1,9 +1,9 @@
 
-def rectagle_area(height: float, width: float) -> float:
-    """
-    :param width: Rectangle width
-    :param height:   Rectangle height
-    :return: Rectangle area
-    """
-    area = width * height
-    return area
+import numpy as np
+class neural_network:
+    def __init__(self, input_nodes, hidden_nodes, output_nodes, learning_rate):
+        self.input_nodes = input_nodes
+        self.hidden_nodes = hidden_nodes
+        self.output_nodes = output_nodes
+        self.learning_rate = learning_rate
+    
