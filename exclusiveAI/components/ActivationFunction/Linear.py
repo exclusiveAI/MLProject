@@ -1,16 +1,13 @@
 import numpy as np
-import ActivationFunction
+from .ActivationFunction import ActivationFunction
+
+__all__ = ["Linear"]
 
 
 class Linear(ActivationFunction):
     def __init__(self):
-        super().__init__()
-        self.name = "Linear"
-        self.function = lambda x: x
-        self.derivative = lambda x: np.ones(x.shape)
-
-    def __str__(self):
-        return self.name
-
-    def __call__(self, x):
-        return self.function(x)
+        super().__init__(
+            name="Linear",
+            function=lambda x: x,
+            derivative=lambda x: np.ones(shape=x.shape),
+        )
