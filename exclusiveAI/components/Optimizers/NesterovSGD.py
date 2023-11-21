@@ -21,9 +21,9 @@ class NesterovSGD(Optimizer):
         for layer, old_delta in myzip(model.layers, self.old_dw):
             layer.weights = layer.weights - self.momentum * old_delta 
             
-        for layer, delta, old_delta in myzip(model.layers, dw, self.old_dw):
-            new_delta = self.learning_rate * delta + self.momentum * old_delta
-            new_dw.append(new_delta)
+        new_deltas = self.learning_rate * dw + self.momentum * self.old_dw
+        
+        for layer, new_delta in myzip(model.layers, new_deltas):
             layer.weights = layer.weights + new_delta - layer.weights * self.regularization * 2
 
         self.old_dw = new_dw if sum(self.old_deltas)==0 else dw
