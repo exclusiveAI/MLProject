@@ -1,0 +1,36 @@
+- [x] Optimizers
+    - [x] SGD
+    - [x] NesterovSGD
+    - [x] Adam
+- [x] Loss Functions
+    - [x] Mean Squared Error
+    - [x] Mean Euclidean Distance
+    - [x] Cross Correlation
+- [x] Activation Functions
+    - [x] Sigmoid
+    - [x] Tanh
+    - [x] ReLU
+    - [x] ELU
+    - [x] Linear
+- [ ] Initializers
+    - [ ] Uniform
+    - [ ] Gaussian
+- [ ] Layers
+    - [ ] Layer
+    - [ ] HiddenLayer
+    - [ ] InputLayer
+    - [ ] OutputLayer
+- [ ] Schedulers
+    - [ ] Learning Rate Scheduler
+- [ ] Metrics
+    - [ ] Mean Squared Error
+    - [ ] Mean Euclidean Distance
+    - [ ] Mean Absolute Error
+    - [ ] Binary Accuracy
+- [ ] Callbacks
+    - [ ] wandb
+    - [ ] Early Stopping
+- [ ] Devices
+    - [x] mps
+    - [x] default
+    - [ ] cuda
