@@ -3,21 +3,14 @@ from numpy import ndarray
 
 from .LossFunction import LossFunction
 
+__all__ = ["MeanSquaredError"]
+
 
 class MeanSquaredError(LossFunction):
     def __init__(self):
-        super().__init__()
-        self.name = "Mean Squared Error"
-
-        self.loss_function = lambda y_true, y_pred: self.mse_loss(y_true, y_pred)
-        self.loss_function_derivative = lambda y_true, y_pred: self.mse_loss_derivative(y_true, y_pred)
-
-    @staticmethod
-    def mse_loss(y_true, y_pred) -> ndarray:
-        diff = np.subtract(y_true, y_pred)
-        return np.mean(np.sum(np.square(diff), axis=1))
-
-    @staticmethod
-    def mse_loss_derivative(y_true, y_pred) -> ndarray:
-        diff = np.subtract(y_true, y_pred)
-        return (-2 * diff) * diff
+        super().__init__(
+            name="Mean Squared Error",
+            loss_function=lambda y_true, y_pred: np.mean(np.sum(np.square(np.subtract(y_true, y_pred)), axis=1)),
+            loss_function_derivative=lambda y_true, y_pred: (-2 * np.subtract(y_true, y_pred)) * np.subtract(y_true,
+                                                                                                             y_pred)
+        )
