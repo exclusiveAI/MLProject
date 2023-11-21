@@ -1,4 +1,6 @@
 from .ActivationFunction import ActivationFunction
+import math
+import latexify
 import numpy as np
 
 __all__ = ["ELU"]

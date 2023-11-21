@@ -1,5 +1,5 @@
 import numpy as np
-from exclusiveAI.components.ActivationFunction import ELU, ReLU, Linear, Sigmoid, Tanh
+from exclusiveAI.components.ActivationFunctions import ELU, ReLU, Linear, Sigmoid, Tanh
 
 
 def test_activation_functions():
