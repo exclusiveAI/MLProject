@@ -1,12 +1,8 @@
 __all__ = ['Initializer']
 
-import logging
 class Initializer:
-    def __init__(self, config):
-        self.config = config
-        self.logger = logging.getLogger(__name__)
+    def __init__(self):
+        self.name = 'Initializer'
 
-    def initialize(self):
-        self.logger.info("Initializing...")
-        self.logger.info("Initializing done.")
-        return self.config
+    def initialize(self, shape):
+        pass
