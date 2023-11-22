@@ -1,5 +1,6 @@
 __all__ = ['utils']
 
+
 def myzip(*iterables):
     sentinel = object()
     iterators = [iter(it) for it in iterables if it]
