@@ -18,5 +18,5 @@ class cuda(Device):
         self.device_properties["max_threads_per_block"] = self.device.max_threads_per_block
         self.device_properties["max_block_size"] = self.device.max_block_size
         
-    def activationfn_sigmoid(self, v):
+    # def activationfn_sigmoid(self, v):
         # return cupy.sigmoid(v)
