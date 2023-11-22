@@ -17,6 +17,7 @@ class Layer:
         self.initializer = inizializer
         self.is_initialized = False
         self.error = None
+        self.nets = None
         
         
         
@@ -30,5 +31,5 @@ class Layer:
     def feedforward(self, input):
         if not self.is_initialized:
             raise Exception("Layer not initialized")
-        self.output = self.activation_func.activate(input @ self.weights)
+        self.output = self.activation_func.function (input @ self.weights)
         return self.output

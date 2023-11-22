@@ -13,7 +13,7 @@ class Adam(Optimizer):
         self.eps = eps
         
     def update(self, model, y_true, x):
-        if self.old_dw is None: self.old_dw = [0 for _ in model.layers]
+        if self.old_dw is None: self.old_dw = [[0 for layer in model.layers] for _ in layer.weights]
         
         deltas = self.calulate_deltas(model, y_true, x)
 

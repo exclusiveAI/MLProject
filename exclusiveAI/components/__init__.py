@@ -1,3 +1,3 @@
 from . import ActivationFunctions
-from . import LossFunction
-from . import Device
+from . import LossFunctions
+from . import Devices

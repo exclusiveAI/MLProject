@@ -9,7 +9,7 @@ class NesterovSGD(Optimizer):
 
     #     Gradient Descent algorithm
     def update(self, model, y_true, x):
-        if not self.old_dw: self.old_dw = [0 for _ in model.layers]
+        if not self.old_dw: self.old_dw = [[0 for layer in model.layers] for _ in layer.weights]
 
         new_dw = []
                 
@@ -19,7 +19,7 @@ class NesterovSGD(Optimizer):
         dw = self.calulate_deltas(model, y_true, x)
         
         for layer, old_delta in myzip(model.layers, self.old_dw):
-            layer.weights = layer.weights - self.momentum * old_delta 
+            layer.weights = layer.weights - self.momentum * old_delta
             
         new_deltas = self.learning_rate * dw + self.momentum * self.old_dw
         
