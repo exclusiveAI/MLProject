@@ -15,11 +15,10 @@
 - [x] Initializers
     - [x] Uniform
     - [x] Gaussian
-- [ ] Layers
-    - [ ] Layer
-    - [ ] HiddenLayer
-    - [ ] InputLayer
-    - [ ] OutputLayer
+- [x] Layers
+    - [x] Layer
+    - [x] InputLayer
+    - [x] OutputLayer
 - [ ] Schedulers
     - [ ] Learning Rate Scheduler
 - [ ] Metrics
@@ -27,9 +26,9 @@
     - [x] Mean Euclidean Distance
     - [x] Mean Absolute Error
     - [ ] Binary Accuracy
-- [ ] Callbacks
-    - [ ] wandb
-    - [ ] Early Stopping
+- [x] Callbacks
+    - [x] wandb
+    - [x] Early Stopping
 - [ ] Devices
     - [x] mps
     - [x] default
