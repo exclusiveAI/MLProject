@@ -22,3 +22,6 @@ class Optimizer:
     
     def update_lr(self):
         self.learning_rate = self.lr_scheduler.update(self.learning_rate)
+
+    def update(self, model, y_true, x):
+        pass
