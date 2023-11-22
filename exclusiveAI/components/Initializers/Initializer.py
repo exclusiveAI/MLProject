@@ -4,7 +4,7 @@ import numpy as np
 
 
 class Initializer:
-    def __init__(self):
+    def __init__(self, name=None):
         self.name = 'Initializer'
 
     def initialize(self, shape):
