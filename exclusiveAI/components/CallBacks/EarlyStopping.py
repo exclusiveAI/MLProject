@@ -1,4 +1,5 @@
 __all__ = ['EarlyStopping']
+from ..neural_network import neural_network
 
 
 class EarlyStopping:
@@ -10,7 +11,9 @@ class EarlyStopping:
         self.patience_limit = patience_limit
         self.stop = False
 
-    def update(self, model, loss, epoch):
+    def __call__(self, model: neural_network):
+        loss = model.layers[-1].error
+        epoch = model.curr_epoch
         if loss < self.best_loss:
             self.best_loss = loss
             self.best_epoch = epoch
@@ -20,4 +23,4 @@ class EarlyStopping:
 
         if self.patience > self.patience_limit:
             self.stop = True
-            model.stop = True
+            model.early_stop = True

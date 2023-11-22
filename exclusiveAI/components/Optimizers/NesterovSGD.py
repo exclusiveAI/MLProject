@@ -8,7 +8,7 @@ class NesterovSGD(Optimizer):
         self.momentum = momentum
 
     #     Gradient Descent algorithm
-    def update(self, model, y_true, x):
+    def update(self, model, x, y_true):
         if not self.old_dw: self.old_dw = [[0 for layer in model.layers] for _ in layer.weights]
 
         new_dw = []
