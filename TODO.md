@@ -23,9 +23,9 @@
 - [ ] Schedulers
     - [ ] Learning Rate Scheduler
 - [ ] Metrics
-    - [ ] Mean Squared Error
-    - [ ] Mean Euclidean Distance
-    - [ ] Mean Absolute Error
+    - [x] Mean Squared Error
+    - [x] Mean Euclidean Distance
+    - [x] Mean Absolute Error
     - [ ] Binary Accuracy
 - [ ] Callbacks
     - [ ] wandb
