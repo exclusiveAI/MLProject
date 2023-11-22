@@ -12,9 +12,9 @@
     - [x] ReLU
     - [x] ELU
     - [x] Linear
-- [ ] Initializers
-    - [ ] Uniform
-    - [ ] Gaussian
+- [x] Initializers
+    - [x] Uniform
+    - [x] Gaussian
 - [ ] Layers
     - [ ] Layer
     - [ ] HiddenLayer
