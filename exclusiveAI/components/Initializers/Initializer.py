@@ -9,6 +9,7 @@ class Initializer:
 
     def initialize(self, shape):
         pass
-    
-    def ones(self, shape):
+
+    @staticmethod
+    def ones(shape):
         return np.ones(shape)

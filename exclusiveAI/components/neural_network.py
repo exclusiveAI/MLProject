@@ -4,8 +4,7 @@ from exclusiveAI.components import Layers
 from exclusiveAI.components.Layers import InputLayer, Layer
 from exclusiveAI.components.LossFunctions import LossFunction
 from exclusiveAI.components.Optimizers import Optimizer
-from ..utils import utils
-
+from exclusiveAI import utils
 
 class neural_network:
     def __init__(self,
@@ -31,9 +30,9 @@ class neural_network:
         self.initialize()
 
     def initialize(self):
-        self.layers[0].initialize()
+        self.layers[0].initialize(name='Input', verbose=self.verbose)
         for i, layer in enumerate(self.layers[1:]):
-            layer.initialize(self.layers[i - 1])
+            layer.initialize(self.layers[i], name=('Layer' + str(i)), verbose=self.verbose)
 
     def train(self,
               inputs: np.array,
