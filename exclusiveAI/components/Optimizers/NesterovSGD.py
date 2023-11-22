@@ -1,5 +1,5 @@
 from .Optimizer import Optimizer
-from ...utils import myzip
+import numpy as np
 
 
 class NesterovSGD(Optimizer):
@@ -9,7 +9,7 @@ class NesterovSGD(Optimizer):
 
     #     Gradient Descent algorithm
     def update(self, model, x, y_true):
-        if not self.old_dw: self.old_dw = [[0 for layer in model.layers] for _ in layer.weights]
+        if not self.old_dw: self.old_dw = np.array([[0 for _ in layer.weights] for layer in model.layers])
 
         new_dw = []
                 

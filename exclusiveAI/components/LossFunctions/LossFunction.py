@@ -2,10 +2,10 @@ __all__ = ['LossFunction']
 
 
 class LossFunction:
-    def __int__(self, name, function, derivative) -> None:
+    def __init__(self, name, function, derivative):
         self.name = name
-        self.loss_function = function
-        self.loss_function_derivative = derivative
+        self.function = function
+        self.function_derivative = derivative
 
     def __str__(self) -> str:
         return self.name
