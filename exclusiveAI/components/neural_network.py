@@ -44,11 +44,11 @@ class neural_network:
         # check if both val and val_label are provided
         if val is not None and val_labels is not None:
             # check if val and val_label have the same shape
-            if val.shape != val_labels.shape:
+            if val.shape[0] != val_labels.shape[0]:
                 raise ValueError("val and val_label must have the same shape")
         MetricUtils.initializeHistory(self, val is not None)
 
-        with tqdm(total=epochs, desc="Epochs") as pbar:
+        with tqdm(total=epochs, desc="Epochs", colour="white") as pbar:
             for epoch in range(epochs):
                 output = self.predict(inputs)
 
@@ -64,17 +64,18 @@ class neural_network:
                     break
 
                 self.curr_epoch += 1
-                # if self.verbose:
-                #     print(f"Epoch {self.curr_epoch}/{epochs}")
 
                 batches = utils.split_batches(inputs, input_label, batch_size)
                 for (batch, batch_label) in batches:
                     self.optimizer.update(self, batch, batch_label)
                 pbar.update(1)
-                for metric in self.history:
-                    pbar.write(f"{metric}: {self.history[metric][-1]}")
-                # pbar.set_postfix(loss=self.history[-1]['loss'])
-            return self.history
+                pbar.set_postfix(self.get_last())
+
+            pbar.close()
+        return self.history
+
+    def get_last(self):
+        return {name: self.history[name][-1] for name in self.history}
 
     def predict(self, input: np.array):
         input = input

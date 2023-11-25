@@ -26,7 +26,6 @@ def initializeHistory(model, val: bool):
         model.history[metric.name] = []
         if val:
             model.history["val_" + metric.name] = []
-    print(model.history)
 
 
 def addToHistory(model, y_train_pred, y_train_true, y_val_pred, y_val_true):
