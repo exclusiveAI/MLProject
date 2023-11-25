@@ -9,6 +9,6 @@ class MeanSquaredError(LossFunction):
         super().__init__(
             name="Mean Squared Error",
             function=lambda y_true, y_pred: np.mean(np.sum(np.square(np.subtract(y_true, y_pred)), axis=1)),
-            function_derivative=lambda y_true, y_pred: (-2 * np.subtract(y_true, y_pred)) * np.subtract(y_true,
+            derivative=lambda y_true, y_pred: (-2 * np.subtract(y_true, y_pred)) * np.subtract(y_true,
                                                                                                              y_pred)
         )

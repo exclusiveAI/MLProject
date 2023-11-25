@@ -5,3 +5,4 @@ from exclusiveAI.components import Initializers
 from exclusiveAI.components import neural_network
 from exclusiveAI.components import Layers
 from exclusiveAI.components import CallBacks
+from exclusiveAI.components import Metrics
