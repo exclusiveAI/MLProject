@@ -24,6 +24,7 @@ class InputLayer(Layer):
         if self.verbose:
             print(f"Initializing {self.name}")
             print(f"Input shape: {self.input_shape}")
+            print(f"Input: {self.input}")
             print(f"Output shape: {self.units}")
             print(f"Activation function: {self.activation_func.name}")
             print(f"Initializer: {self.initializer.name}")

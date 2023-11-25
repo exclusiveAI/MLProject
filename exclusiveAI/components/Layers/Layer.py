@@ -33,6 +33,7 @@ class Layer:
         if self.verbose:
             print(f"Initializing {self.name}")
             print(f"Input shape: {self.prev.units}")
+            print(f"Weights shape: {self.weights.shape}")
             print(f"Output shape: {self.units}")
             print(f"Activation function: {self.activation_func.name}")
             print(f"Initializer: {self.initializer.name}")
@@ -45,7 +46,7 @@ class Layer:
 
         local_input = np.insert(input, 0, 1, axis=-1)  # adding bias to input
 
-        self.nets = local_input @ self.weights
+        self.nets = (local_input @ self.weights)  # calculate the net input for current unit
         self.output = self.activation_func.function(self.nets)
         return self.output
 

@@ -1,10 +1,10 @@
 import numpy as np
-from exclusiveAI.components import Layers
-
-from exclusiveAI.components.Layers import InputLayer, Layer
 from exclusiveAI.components.LossFunctions import LossFunction
 from exclusiveAI.components.Optimizers import Optimizer
+from exclusiveAI.components.Metrics import MetricUtils
 from exclusiveAI import utils
+from tqdm import tqdm
+
 
 class neural_network:
     def __init__(self,
@@ -13,7 +13,8 @@ class neural_network:
                  optimizer: Optimizer,
                  learning_rate: float,
                  callbacks: list,
-                 verbose: bool = False
+                 metrics: [],
+                 verbose: bool = False,
                  ):
         self.learning_rate = learning_rate
         self.optimizer = optimizer
@@ -24,8 +25,8 @@ class neural_network:
         self.early_stop = False
 
         self.curr_epoch = 0
-
-        self.history = []
+        self.metrics = metrics
+        self.history = {}
 
         self.initialize()
 
@@ -45,29 +46,35 @@ class neural_network:
             # check if val and val_label have the same shape
             if val.shape != val_labels.shape:
                 raise ValueError("val and val_label must have the same shape")
+        MetricUtils.initializeHistory(self, val is not None)
 
-        for epoch in range(epochs):
-            output = self.predict(inputs)
+        with tqdm(total=epochs, desc="Epochs") as pbar:
+            for epoch in range(epochs):
+                output = self.predict(inputs)
 
-            val_output = None
-            if val:
-                val_output = self.predict(val)
+                val_output = None
+                if val is not None:
+                    val_output = self.predict(val)
 
-            for callback in self.callbacks:
-                callback(self)
+                MetricUtils.addToHistory(self, output, input_label, val_output, val_labels)
+                for callback in self.callbacks:
+                    callback(self)
 
-            if self.early_stop:
-                break
+                if self.early_stop:
+                    break
 
-            self.curr_epoch += 1
-            if self.verbose:
-                print(f"Epoch {self.curr_epoch}/{epochs}")
+                self.curr_epoch += 1
+                # if self.verbose:
+                #     print(f"Epoch {self.curr_epoch}/{epochs}")
 
-            batches = utils.split_batches(inputs, input_label, batch_size)
-            for (batch, batch_label) in batches:
-                self.optimizer.update(self, batch, batch_label)
-
-        return self.history
+                batches = utils.split_batches(inputs, input_label, batch_size)
+                for (batch, batch_label) in batches:
+                    self.optimizer.update(self, batch, batch_label)
+                pbar.update(1)
+                for metric in self.history:
+                    pbar.write(f"{metric}: {self.history[metric][-1]}")
+                # pbar.set_postfix(loss=self.history[-1]['loss'])
+            return self.history
 
     def predict(self, input: np.array):
         input = input
