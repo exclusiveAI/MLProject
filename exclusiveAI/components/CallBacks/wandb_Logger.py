@@ -4,29 +4,25 @@ import wandb
 
 
 class wandb_Logger:
-    def __init__(self):
+    def __init__(self, run_name, project='exclusiveAI', config=None):
         self.name = 'wandb'
-        self.config = None
+        self.run = ''
+        self.config = config
         self.project = None
         self.run = None
         self.log_dict = {}
         self.log_list = []
-
-    @staticmethod
-    def init(project, name, config):
-        wandb.init(project=project, name=name, config=config)
-        # define our custom x axis metric
+        wandb.init(project=project, name=run_name, config=config)
         wandb.define_metric("train/step")
         # set all other train/ metrics to use this step
         wandb.define_metric("train/*", step_metric="train/step")
         wandb.define_metric("val/*", step_metric="train/step")
 
     def __call__(self, model, *args, **kwargs):
-        self.log_dict = {
-            'train/loss':  model.metrics['train_loss'],
-            'train/acc': model.metrics['train_acc'],
-            'val/loss': model.metrics['val_loss'],
-            'train/step': model.metrics['epoch'],
-            'val/acc': model.metrics['val_acc'],
-        }
+        for name in model.history:
+            if name.split('_')[0] == 'val':
+                self.log_dict['val/' + name.split('_')[-1]] = model.history[name][-1]
+            else:
+                self.log_dict['train/' + name] = model.history[name][-1]
+            self.log_dict['train/step'] = model.curr_epoch
         wandb.log(self.log_dict)

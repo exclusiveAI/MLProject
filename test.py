@@ -5,41 +5,43 @@ from exclusiveAI.components.ActivationFunctions import *
 from exclusiveAI.components.Layers import *
 from exclusiveAI.components.Initializers import *
 from exclusiveAI.components.LossFunctions import *
+from exclusiveAI.components.CallBacks import *
 import numpy as np
 
-x = np.random.rand(10000).reshape(-1, 1)
-y = np.array(np.square(x))
 
-x_train = x[:8000]
-y_train = y[:8000]
+x1 = np.random.rand(100)
+x2 = np.random.rand(100)
+x3 = np.random.rand(100)
 
-x_val = x[8000:9000]
-y_val = y[8000:9000]
+x = np.array([x1, x2, x3]).T
+y = np.array(np.square(x[:, :1]))
+x_train = x[:80]
+y_train = y[:80]
 
-x_test = x[9000:]
-y_test = y[9000:]
+x_val = x[80:90]
+y_val = y[80:90]
 
+x_test = x[90:]
+y_test = y[90:]
 initializer = Gaussian()
+
+wandb = wandb_Logger(run_name='test', project='exclusiveAI', config=None)
 
 loss_func = MeanEuclideanDistance()
 layers = []
-input_layer = InputLayer(input_shape=1, input=x)
+input_layer = InputLayer(input_shape=3, input=x)
 layer_1 = Layer(units=1, activation_func=Sigmoid(), initializer=initializer)
-layer_2 = Layer(units=2, activation_func=Sigmoid(), initializer=initializer)
-layer_3 = Layer(units=3, activation_func=Tanh(), initializer=initializer)
 output_layer = OutputLayer(units=1, activation_function=Linear(), initializer=initializer, loss_function=loss_func)
 layers.append(input_layer)
 layers.append(layer_1)
-layers.append(layer_2)
-layers.append(layer_3)
 layers.append(output_layer)
 
-learning_rate = 0.0001
-optimizer = SGD(learning_rate=learning_rate, regularization=0.0001, momentum=0.01)
-nn = neural_network.neural_network(learning_rate=learning_rate, optimizer=optimizer, callbacks=[], verbose=True,
-                                   layers=layers, loss=loss_func, metrics=['mse'])
+learning_rate = 0.00001
+optimizer = SGD(learning_rate=learning_rate, regularization=0.0001, momentum=0.001)
+nn = neural_network.neural_network(learning_rate=learning_rate, optimizer=optimizer, callbacks=[wandb],
+                                   layers=layers, loss=loss_func, metrics=['mse', 'mae', 'mee'])
 
-nn.train(x_train, y_train, epochs=2000, batch_size=128, val=x_val, val_labels=y_val)
-res = nn.predict(x_test)
-
-print(res)
+nn.train(x_train, y_train, epochs=10000, batch_size=256, val=x_val, val_labels=y_val)
+# res = nn.predict(x_test)
+#
+# print(res)
