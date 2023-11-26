@@ -4,4 +4,4 @@ from . import Initializers
 from . import Optimizers
 from . import Layers
 from . import Metrics
-from . import CallBacks
+from . import Callbacks

@@ -5,7 +5,7 @@ __all__ = ["Uniform"]
 
 
 class Uniform(Initializer):
-    def __init__(self, low, high):
+    def __init__(self, low=0, high=0.2):
         super().__init__(name='Uniform')
         self.low = low
         self.high = high

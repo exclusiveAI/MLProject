@@ -1,4 +1,5 @@
 from exclusiveAI import utils
+from exclusiveAI.ConfiguratorGen import ConfiguratorGen
 # from exclusiveAI.components import *
 # from exclusiveAI import neural_network
 # from exclusiveAI.components.Optimizers import *
@@ -6,16 +7,16 @@ from exclusiveAI import utils
 # from exclusiveAI.components.Layers import *
 # from exclusiveAI.components.Initializers import *
 # from exclusiveAI.components.LossFunctions import *
-# from exclusiveAI.components.CallBacks import *
-import numpy as np
+# from exclusiveAI.components.Callbacks import *
+# import numpy as np
 #
 #
-x1 = np.random.rand(100)
-x2 = np.random.rand(100)
-x3 = np.random.rand(100)
-#
-x = np.array([x1, x2, x3]).T
-y = np.array(np.square(x[:, :1]))
+# x1 = np.random.rand(100)
+# x2 = np.random.rand(100)
+# x3 = np.random.rand(100)
+# #
+# x = np.array([x1, x2, x3]).T
+# y = np.array(np.square(x[:, :1]))
 # x_train = x[:80]
 # y_train = y[:80]
 #
@@ -48,6 +49,12 @@ y = np.array(np.square(x[:, :1]))
 # #
 # # print(res)
 
-train, y_train, tmp1, y_tmp1, train_indexes, tmp_indexes = utils.train_split(x, y, split_size=0.3, random_state=42)
-val, y_val, test, y_test, val_indexes, test_indexes = utils.train_split(tmp1, y_tmp1, split_size=0.33, random_state=42)
-print(len(train), len(val), len(test), tmp_indexes, val_indexes, test_indexes)
+values= ['1e3', '1e4', '1e5']
+
+myconfigurator = ConfiguratorGen(random=True, regularizations=values, learning_rates=values,
+                                    loss_functions=['mse'], optimizers=['sgd'],
+                                    activation_functions=['sigmoid', 'tanh', 'relu'],
+                                    number_of_units=[8, 16, 32], number_of_layers=[1, 2, 3, 4, 5],
+                                    momentums=[0.01, 0.001, 0.0001], initializers=['gaussian', 'uniform'], input_shapes=1,
+                                    )
+print(myconfigurator.next())

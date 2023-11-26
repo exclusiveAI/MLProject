@@ -6,8 +6,9 @@ from exclusiveAI.components.ActivationFunctions import ActivationFunction
 
 class SGD(Optimizer):
     def __init__(self, momentum: float, learning_rate: float, regularization: float):
-        super().__init__(learning_rate=learning_rate, regularization=regularization)
+        super().__init__(learning_rate=learning_rate)
         self.momentum = momentum
+        self.regularization = regularization
 
     #     Gradient Descent algorithm
     def update(self, model, x, y_true):

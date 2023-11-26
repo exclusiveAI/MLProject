@@ -1,8 +1,8 @@
-__all__ = ['EarlyStopping']
+__all__ = ['EarlyStoppingCallback']
 from ..neural_network import neural_network
 
 
-class EarlyStopping:
+class EarlyStoppingCallback:
     def __init__(self, patience_limit: int = 3):
 
         self.best_loss = float('inf')

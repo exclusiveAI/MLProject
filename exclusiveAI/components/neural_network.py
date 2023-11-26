@@ -9,17 +9,13 @@ from tqdm import tqdm
 class neural_network:
     def __init__(self,
                  layers: list,
-                 loss: LossFunction,
                  optimizer: Optimizer,
-                 learning_rate: float,
                  callbacks: list,
                  metrics: [],
                  verbose: bool = False,
                  ):
-        self.learning_rate = learning_rate
         self.optimizer = optimizer
         self.callbacks = callbacks
-        self.loss_function = loss
         self.layers = layers
         self.verbose = verbose
         self.early_stop = False
