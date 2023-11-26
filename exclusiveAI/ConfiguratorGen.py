@@ -91,7 +91,7 @@ class ConfiguratorGen:
                                   input_shape=self.input_shapes, callbacks=self.callbacks, verbose=self.verbose,
                                   outputs=self.outputs)
         model = composed_model.compose()
-        return model
+        return model, config
 
     def __iter__(self):
         return self

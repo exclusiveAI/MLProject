@@ -2,7 +2,7 @@ from . import MAE
 from . import MEE
 from . import MSE
 
-__all__ = ["stringToMetric", "initializeHistory", "addToHistory", "printHistory"]
+__all__ = ["stringToMetric", "initializeHistory", "addToHistory", "printHistory", "calculate"]
 
 MATCH = {
     "mse": MSE,
@@ -40,3 +40,7 @@ def printHistory(model, val: bool):
         print(metric, model.history[metric])
         if val:
             print("val_" + metric, model.history["val_" + metric])
+
+
+def calculate(func, target, predicted):
+    return MATCH[func](predicted, target)

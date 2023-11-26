@@ -80,3 +80,7 @@ class neural_network:
             output = layer.feedforward(input)
             input = output
         return output
+
+    def evaluate(self, input: np.array, input_label: np.array):
+        output = self.predict(input)
+        return MetricUtils.calculate('mse', target=input_label, predicted=output)
