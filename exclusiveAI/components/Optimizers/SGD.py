@@ -16,7 +16,7 @@ class SGD(Optimizer):
 
         if not self.old_dw:
             for layer, delta in zip(model.layers, dw):
-                layer.weights = layer.weights + delta - layer.weights * self.regularization * 2
+                layer.weights = layer.weights + delta * self.learning_rate - layer.weights * self.regularization * 2
             self.old_dw = dw
             return
 

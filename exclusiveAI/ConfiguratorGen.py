@@ -73,15 +73,19 @@ class ConfiguratorGen:
             units = list(itertools.product(number_of_units, repeat=num_layers))
             activations = list(itertools.product(activation_functions, repeat=num_layers))
             activations = [list(a) + [self.output_activation] for a in activations]
-            for i in range(num_layers):
-                local_config = internal_config[:6] + [units[i], activations[i]] + internal_config[6:]
-                final_configs.append(local_config)
+            for activation in activations:
+                for unit in units:
+                    local_config = internal_config[:6] + [unit, activation] + internal_config[6:]
+                    final_configs.append(local_config)
         self.configs = list(final_configs)
         self.current = -1
-        self.max = num_of_configurations
+        self.max = num_of_configurations if self.type == 'random' else len(self.configs) - 1
 
     def next(self):
         self.current += 1
+        if self.verbose:
+            print(f"Current configuration: {self.current}")
+            print(self.max)
         config = self.configs[self.current]
         composed_model = Composer(regularization=config[0], learning_rate=config[1], loss_function=config[2],
                                   activation_functions=list(config[7]),
@@ -91,12 +95,22 @@ class ConfiguratorGen:
                                   input_shape=self.input_shapes, callbacks=self.callbacks, verbose=self.verbose,
                                   outputs=self.outputs)
         model = composed_model.compose()
+        config = {"regularization": config[0], "learning_rate": config[1], "loss_function": config[2],
+                                  "activation_functions": list(config[7]),
+                                  "num_of_units": list(config[6]), "num_layers": config[5], "momentum": config[3],
+                                  "optimizer": config[4],
+                                  "initializers": config[8],
+                                  "input_shape": self.input_shapes, "callbacks": self.callbacks, "verbose": self.verbose,
+                                  "outputs": self.outputs}
         return model, config
 
     def __iter__(self):
         return self
 
     def __next__(self):
-        if self.current > self.max:
+        if self.current >= self.max:
             raise StopIteration
         return self.next()
+    
+    def len(self):
+        return self.max

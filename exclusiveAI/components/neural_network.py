@@ -19,7 +19,7 @@ class neural_network:
         self.layers = layers
         self.verbose = verbose
         self.early_stop = False
-
+        self.name = 'Model ' + str(len(self.layers))
         self.curr_epoch = 0
         self.metrics = metrics
         self.history = {}
@@ -36,7 +36,7 @@ class neural_network:
               input_label: np.array,
               val: np.array = None,
               val_labels: np.array = None,
-              epochs=100, batch_size=32):
+              epochs=1000, batch_size=32, name:str='', thread: int=0):
         # check if both val and val_label are provided
         if val is not None and val_labels is not None:
             # check if val and val_label have the same shape
@@ -44,7 +44,7 @@ class neural_network:
                 raise ValueError("val and val_label must have the same shape")
         MetricUtils.initializeHistory(self, val is not None)
 
-        with tqdm(total=epochs, desc="Epochs", colour="white") as pbar:
+        with tqdm(total=epochs, position=thread, desc="Epochs", colour="white") as pbar:
             for epoch in range(epochs):
                 output = self.predict(inputs)
 
@@ -65,6 +65,8 @@ class neural_network:
                 for (batch, batch_label) in batches:
                     self.optimizer.update(self, batch, batch_label)
                 pbar.update(1)
+                if name != '':
+                    pbar.set_description(name)
                 pbar.set_postfix(self.get_last())
 
             pbar.close()

@@ -1,6 +1,10 @@
 from exclusiveAI.ConfiguratorGen import ConfiguratorGen
+from exclusiveAI.Composer import Composer
 from exclusiveAI.components.Validation import *
+from exclusiveAI.components.Callbacks import *
 from exclusiveAI.datasets.monk import read_monk1
+from exclusiveAI.utils import confusion_matrix
+from exclusiveAI.components.Initializers import *
 # from exclusiveAI.components import *
 # from exclusiveAI import neural_network
 # from exclusiveAI.components.Optimizers import *
@@ -52,18 +56,42 @@ import numpy as np
 
 train, test = read_monk1()
 train_label = np.array(train.pop('class')).reshape(-1, 1)
-test_label = np.array(test.pop('class'))
+test_label = np.array(test.pop('class')).reshape(-1, 1)
 # remove_id
 train = np.array(train)
 
-values= [0.01, 0.001, 0.0001]
+ea = EarlyStoppingCallback(patience_limit=50)
+values= [0.01, 0.001, 0.0001, 0.00001]
+
+uniform = Uniform(low=-1, high=1)
 
 myconfigurator = ConfiguratorGen(random=True, num_of_configurations=10, regularizations=values, learning_rates=values,
                                     loss_functions=['mse'], optimizers=['sgd'],
-                                    activation_functions=['sigmoid', 'tanh', 'relu'],
-                                    number_of_units=[1, 2, 4, 8, 16], number_of_layers=[1, 2, 3, 4, 5],
-                                    momentums=[0.9], initializers=['gaussian', 'uniform'], input_shapes=train.shape[-1], verbose=True
+                                    activation_functions=['relu'],
+                                    number_of_units=[4, 8, 10], number_of_layers=[1, 2, 3, 5],
+                                    momentums=[0.01], initializers=[uniform], input_shapes=train.shape[-1], verbose=False,
+                                    callbacks=[ea], output_activation='sigmoid'
                                     )
 
-myval = HoldOut(models=myconfigurator, input=train, target=train_label)
-myval.hold_out()
+myval = HoldOut(models=myconfigurator, input=train, target=train_label, debug=True)
+config = myval.parallel_hold_out()
+
+ea = EarlyStoppingCallback(patience_limit=50)
+config['callbacks'] = [ea, 'wandb']
+model = Composer(config=config).compose()
+
+print("Model found:", config)
+model.train(train, train_label, epochs=10000)
+
+res = model.evaluate(input=test, input_label=test_label)
+
+print(res)
+
+prediction = model.predict(input=test)
+
+# prediction = 1 if x > 0.5 else 0
+prediction = np.round(prediction)
+
+
+
+confusion_matrix(prediction, test_label)

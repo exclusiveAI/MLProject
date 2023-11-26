@@ -22,6 +22,9 @@ class Layer:
         self.error = None
         self.nets = None
         self.verbose = None
+        
+    def __str__(self) -> str:
+        return f"{self.name} - {self.units}"
 
     def initialize(self, prev, name: str = '', verbose: bool = False):
         self.weights = self.initializer.initialize(shape=(prev.units + 1, self.units))

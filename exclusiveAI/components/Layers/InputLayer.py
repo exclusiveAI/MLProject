@@ -15,6 +15,9 @@ class InputLayer(Layer):
         self.input_shape = input_shape,
         self.input = None
 
+    def __str__(self) -> str:
+        return super().__str__()
+
     def initialize(self, name: str = '', verbose: bool = False, **kwargs):
         self.weights = self.initializer.ones(shape=(self.input_shape[-1] + 1, self.units))
         self.name = name
