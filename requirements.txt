@@ -39,3 +39,4 @@ zipp==3.17.0
 
 setuptools~=65.5.0
 wandb~=0.16.0
+pandas~=2.1.3

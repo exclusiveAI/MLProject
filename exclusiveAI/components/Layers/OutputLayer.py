@@ -23,6 +23,9 @@ class OutputLayer(Layer):
         if not self.is_initialized:
             raise Exception("Layer not initialized")
 
+        if y_true.shape != self.output.shape:
+            raise Exception("Different shapes", y_true.shape, self.output.shape)
+
         # calculate the product between the error signal and incoming weights from current unit
         loss_btw_output_and_y_true = self.loss_function.function_derivative(y_true, self.output)
         self.error = self.activation_func.derivative(self.nets) * loss_btw_output_and_y_true
