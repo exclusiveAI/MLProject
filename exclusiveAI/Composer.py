@@ -21,6 +21,7 @@ LossFunctionsNames = {
     'meaneuclideandistance': MeanEuclideanDistance,
     'mse': MeanSquaredError,
     'mee': MeanEuclideanDistance,
+    'crosscorrelation': CrossCorrelation,
 }
 
 ActivationFunctionsNames = {
@@ -54,8 +55,23 @@ class Composer:
                  input_shape=None,
                  callbacks=None,
                  verbose=False,
-                 outputs=1
+                 outputs=1,
+                 config: {} = None,
                  ):
+        if config is not None:
+            regularization = config.get('regularization', regularization)
+            learning_rate = config.get('learning_rate', learning_rate)
+            loss_function = config.get('loss_function', loss_function)
+            activation_functions = config.get('activation_functions', activation_functions)
+            num_of_units = config.get('num_of_units', num_of_units)
+            num_layers = config.get('num_layers', num_layers)
+            momentum = config.get('momentum', momentum)
+            optimizer = config.get('optimizer', optimizer)
+            initializers= config.get('initializers', initializers)
+            callbacks = config.get('callbacks', callbacks)
+            verbose = config.get('verbose', verbose)
+            outputs = config.get('outputs', outputs)
+            input_shape = config.get('input_shape', input_shape)
         self.optimizer = optimizer
         if input_shape is None:
             # Error can't initialize
@@ -110,21 +126,21 @@ class Composer:
         # If one, every layer will have the same initializer
         # If more than one, each layer will have its own initializer and the # of initializers must be equal to # of layer
         self.initializers = [InitializersNames[initializer.lower()]() if isinstance(initializer, str) else initializer
-                             for initializer in initializers]
+                            for initializer in initializers]
 
-        self.callbacks = [CallbacksNames[callback.lower()]() if isinstance(callback, str) else callback
-                          for callback in callbacks]
+        self.callbacks = [CallbacksNames[callback.lower()](run_name='test') if isinstance(callback, str) else callback
+                        for callback in callbacks]
 
         self.loss_function = LossFunctionsNames[loss_function.lower()]() \
             if isinstance(loss_function, str) else loss_function
 
         self.activation_functions = [ActivationFunctionsNames[activation_function.lower()]()
-                                     if isinstance(activation_function, str) else activation_function
-                                     for activation_function in activation_functions]
+                                    if isinstance(activation_function, str) else activation_function
+                                    for activation_function in activation_functions]
         if (learning_rate is None or regularization is None or momentum is None and isinstance(optimizer, str) and
                 (optimizer.lower() == 'sgd' or optimizer.lower() == 'nesterovsgd')):
             raise ValueError("Parameters learning_rate, regularization and momentum can't be None if Optimizer: ",
-                             optimizer)
+                            optimizer)
         else:
             self.optimizer = OptimizersNames[optimizer.lower()](learning_rate=learning_rate, regularization=regularization, momentum=momentum) \
                 if isinstance(optimizer, str) else optimizer
@@ -147,7 +163,7 @@ class Composer:
 
         model = neural_network.neural_network(optimizer=self.optimizer,
                                               callbacks=self.callbacks,
-                                              metrics=['mse', 'mae', 'mee'],
+                                              metrics=['mse', 'mae', 'mee', 'binary_accuracy'],
                                               layers=layers,
                                               verbose=self.verbose)
 

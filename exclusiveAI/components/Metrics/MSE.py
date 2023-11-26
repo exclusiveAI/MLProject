@@ -6,5 +6,5 @@ __all__ = ['MSE']
 
 class MSE(Metric):
     def __init__(self):
-        f = lambda y_pred, y_true: np.mean((y_pred - y_true) ** 2)
+        f = lambda y_pred, y_true: np.mean(np.sum((y_pred - y_true) ** 2, axis=1))
         super().__init__(name='mse', f=f)

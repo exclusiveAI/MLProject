@@ -3,17 +3,21 @@ from ..neural_network import neural_network
 
 
 class EarlyStoppingCallback:
-    def __init__(self, patience_limit: int = 3):
+    def __init__(self, patience_limit: int = 3, metric: str='val_mse'):
 
         self.best_loss = float('inf')
         self.best_epoch = 0
         self.patience = 0
         self.patience_limit = patience_limit
+        self.metric = metric
         self.stop = False
 
     def __call__(self, model: neural_network):
-        val = list(model.history.keys())[1]
-        loss = model.history[val][-1]
+        if self.metric=='val_mse':
+            # check if val_mse in history
+            if 'val_mse' not in model.history:
+                self.metric = 'mse'
+        loss = model.history[self.metric][-1]
         if model.curr_epoch == 0:
             self.best_loss = loss
             self.best_epoch = 0

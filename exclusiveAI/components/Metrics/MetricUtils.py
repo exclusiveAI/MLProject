@@ -1,6 +1,7 @@
 from . import MAE
 from . import MEE
 from . import MSE
+from . import BinaryAccuracy
 
 __all__ = ["stringToMetric", "initializeHistory", "addToHistory", "printHistory", "calculate"]
 
@@ -8,6 +9,7 @@ MATCH = {
     "mse": MSE,
     "mae": MAE,
     "mee": MEE,
+    "binary_accuracy": BinaryAccuracy,
 }
 
 
@@ -43,4 +45,8 @@ def printHistory(model, val: bool):
 
 
 def calculate(func, target, predicted):
-    return MATCH[func](predicted, target)
+    func = func.lower()
+    if func not in MATCH:
+        raise ValueError("Unknown metric name: " + func)
+    func = MATCH[func]()
+    return func(predicted, target)

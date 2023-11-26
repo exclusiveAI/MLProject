@@ -27,7 +27,7 @@ class OutputLayer(Layer):
             raise Exception("Different shapes", y_true.shape, self.output.shape)
 
         # calculate the product between the error signal and incoming weights from current unit
-        loss_btw_output_and_y_true = self.loss_function.function_derivative(y_true, self.output)
+        loss_btw_output_and_y_true = - self.loss_function.function_derivative(y_true, self.output)
         self.error = self.activation_func.derivative(self.nets) * loss_btw_output_and_y_true
 
         return np.dot(np.insert(self.prev.output, 0, 1, axis=-1).T, self.error)
