@@ -12,7 +12,13 @@ class EarlyStopping:
         self.stop = False
 
     def __call__(self, model: neural_network):
-        loss = model.layers[-1].error
+        val = list(model.history.keys())[1]
+        loss = model.history[val][-1]
+        if model.curr_epoch == 0:
+            self.best_loss = loss
+            self.best_epoch = 0
+            self.patience = 0
+            return
         epoch = model.curr_epoch
         if loss < self.best_loss:
             self.best_loss = loss
