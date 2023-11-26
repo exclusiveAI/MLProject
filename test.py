@@ -1,5 +1,6 @@
-from exclusiveAI import utils
 from exclusiveAI.ConfiguratorGen import ConfiguratorGen
+from exclusiveAI.components.Validation import *
+from exclusiveAI.datasets.monk import read_monk1
 # from exclusiveAI.components import *
 # from exclusiveAI import neural_network
 # from exclusiveAI.components.Optimizers import *
@@ -8,7 +9,7 @@ from exclusiveAI.ConfiguratorGen import ConfiguratorGen
 # from exclusiveAI.components.Initializers import *
 # from exclusiveAI.components.LossFunctions import *
 # from exclusiveAI.components.Callbacks import *
-# import numpy as np
+import numpy as np
 #
 #
 # x1 = np.random.rand(100)
@@ -49,12 +50,20 @@ from exclusiveAI.ConfiguratorGen import ConfiguratorGen
 # #
 # # print(res)
 
-values= ['1e3', '1e4', '1e5']
+train, test = read_monk1()
+train_label = np.array(train.pop('class')).reshape(-1, 1)
+test_label = np.array(test.pop('class'))
+# remove_id
+train = np.array(train)
 
-myconfigurator = ConfiguratorGen(random=True, regularizations=values, learning_rates=values,
+values= [0.01, 0.001, 0.0001]
+
+myconfigurator = ConfiguratorGen(random=True, num_of_configurations=10, regularizations=values, learning_rates=values,
                                     loss_functions=['mse'], optimizers=['sgd'],
                                     activation_functions=['sigmoid', 'tanh', 'relu'],
-                                    number_of_units=[8, 16, 32], number_of_layers=[1, 2, 3, 4, 5],
-                                    momentums=[0.01, 0.001, 0.0001], initializers=['gaussian', 'uniform'], input_shapes=1,
+                                    number_of_units=[1, 2, 4, 8, 16], number_of_layers=[1, 2, 3, 4, 5],
+                                    momentums=[0.9], initializers=['gaussian', 'uniform'], input_shapes=train.shape[-1], verbose=True
                                     )
-print(myconfigurator.next())
+
+myval = HoldOut(models=myconfigurator, input=train, target=train_label)
+myval.hold_out()

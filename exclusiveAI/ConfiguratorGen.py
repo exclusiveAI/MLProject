@@ -78,7 +78,7 @@ class ConfiguratorGen:
                 final_configs.append(local_config)
         self.configs = list(final_configs)
         self.current = -1
-        self.max = len(self.configs)
+        self.max = num_of_configurations
 
     def next(self):
         self.current += 1
@@ -97,6 +97,6 @@ class ConfiguratorGen:
         return self
 
     def __next__(self):
-        if self.current >= self.max:
+        if self.current > self.max:
             raise StopIteration
         return self.next()
