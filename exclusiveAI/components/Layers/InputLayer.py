@@ -5,16 +5,15 @@ import numpy as np
 
 
 class InputLayer(Layer):
-    def __init__(self, input_shape: int, input: np.ndarray):
+    def __init__(self, input_shape: int):
         super().__init__(
             units=input_shape,
             initializer=Initializer(),
             is_trainable=False,
             activation_func=Linear(),
         )
-
         self.input_shape = input_shape,
-        self.input = input
+        self.input = None
 
     def initialize(self, name: str = '', verbose: bool = False, **kwargs):
         self.weights = self.initializer.ones(shape=(self.input_shape[-1] + 1, self.units))

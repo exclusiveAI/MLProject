@@ -1,9 +1,9 @@
-__all__ = ['wandb_Logger']
+__all__ = ['WandbCallback']
 
 import wandb
 
 
-class wandb_Logger:
+class WandbCallback:
     def __init__(self, run_name, project='exclusiveAI', config=None):
         self.name = 'wandb'
         self.run = ''
