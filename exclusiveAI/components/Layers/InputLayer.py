@@ -5,27 +5,27 @@ import numpy as np
 
 
 class InputLayer(Layer):
-    def __init__(self, input_shape: int):
+    def __init__(self, input_len, units: int):
         super().__init__(
-            units=input_shape,
+            units=units,
             initializer=Initializer(),
             is_trainable=False,
             activation_func=Linear(),
         )
-        self.input_shape = input_shape,
+        self.input_len = input_len
         self.input = None
 
     def __str__(self) -> str:
         return super().__str__()
 
     def initialize(self, name: str = '', verbose: bool = False, **kwargs):
-        self.weights = self.initializer.ones(shape=(self.input_shape[-1] + 1, self.units))
+        self.weights = self.initializer.ones(shape=(self.units+1, self.units))
         self.name = name
         self.verbose = verbose
         self.is_initialized = True
         if self.verbose:
             print(f"Initializing {self.name}")
-            print(f"Input shape: {self.input_shape}")
+            print(f"Input shape: {self.input_len}")
             print(f"Input: {self.input}")
             print(f"Output shape: {self.units}")
             print(f"Activation function: {self.activation_func.name}")

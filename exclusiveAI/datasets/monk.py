@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 __all__ = [
     "read_monk",
@@ -19,13 +20,17 @@ def read_monk(index: int) -> tuple:
         names=["class", "a1", "a2", "a3", "a4", "a5", "a6", "id"]
     ).set_index("id")
 
+    train_label = np.array(train_set_df.pop("class"))
+
     test_set_df = pd.read_csv(
         test_set_filepath,
         sep=" ",
         names=["class", "a1", "a2", "a3", "a4", "a5", "a6", "id"]
     ).set_index("id")
 
-    return train_set_df, test_set_df
+    test_label = np.array(test_set_df.pop("class"))
+
+    return train_set_df, train_label, test_set_df, test_label
 
 
 def read_monk1() -> tuple:

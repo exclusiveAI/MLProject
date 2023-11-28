@@ -29,6 +29,7 @@ ActivationFunctionsNames = {
     'tanh': Tanh,
     'relu': ReLU,
     'linear': Linear,
+    'softmax':  Softmax,
 }
 
 OptimizersNames = {
@@ -152,7 +153,7 @@ class Composer:
 
     def compose(self):
         layers = []
-        input_layer = InputLayer(self.input_shape)
+        input_layer = InputLayer(self.input_shape[0], self.input_shape[-1])
         layers.append(input_layer)
         for i in range(self.num_layers):
             layers.append(Layer(self.num_of_units[i], self.initializers[i if self.manyInitializers else 0],

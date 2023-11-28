@@ -1,4 +1,4 @@
-__all__ = ['utils', 'train_split']
+__all__ = ['utils', 'train_split', 'confusion_matrix', 'one_hot_encoding']
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -62,3 +62,11 @@ def confusion_matrix(predicted, target):
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
     plt.savefig('res.png')
+
+
+def one_hot_encoding(y):
+    """
+    One hot encoding.
+    """
+    return np.array(np.eye(np.max(y))[y - 1]).reshape(-1, y.shape[-1] * np.max(y))
+
