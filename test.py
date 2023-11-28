@@ -3,7 +3,7 @@ from exclusiveAI.Composer import Composer
 from exclusiveAI.components.Validation import *
 from exclusiveAI.components.Callbacks import *
 from exclusiveAI.datasets.monk import read_monk1
-from exclusiveAI.utils import confusion_matrix
+from exclusiveAI.utils import confusion_matrix, one_hot_encoding
 from exclusiveAI.components.Initializers import *
 # from exclusiveAI.components import *
 # from exclusiveAI import neural_network
@@ -54,34 +54,36 @@ import numpy as np
 # #
 # # print(res)
 
-train, test = read_monk1()
-train_label = np.array(train.pop('class')).reshape(-1, 1)
-test_label = np.array(test.pop('class')).reshape(-1, 1)
-# remove_id
-train = np.array(train)
+train, train_label, test, test_label = read_monk1()
 
-ea = EarlyStoppingCallback(patience_limit=50)
-values= [0.01, 0.001, 0.0001, 0.00001]
+train = np.array(train.values.tolist())
+train = one_hot_encoding(train)
+test = np.array(test.values.tolist())
+test = one_hot_encoding(test)
+
+
+ea = EarlyStoppingCallback(patience_limit=50, metric='mse')
+values= [0.1, 0.01]
 
 uniform = Uniform(low=-1, high=1)
 
-myconfigurator = ConfiguratorGen(random=True, num_of_configurations=10, regularizations=values, learning_rates=values,
+myconfigurator = ConfiguratorGen(random=False, regularizations=values, learning_rates=values,
                                     loss_functions=['mse'], optimizers=['sgd'],
-                                    activation_functions=['relu'],
-                                    number_of_units=[4, 8, 10], number_of_layers=[1, 2, 3, 5],
-                                    momentums=[0.01], initializers=[uniform], input_shapes=train.shape[-1], verbose=False,
-                                    callbacks=[ea], output_activation='sigmoid'
+                                    activation_functions=['sigmoid'],
+                                    number_of_units=[1, 2, 3, 8, 10], number_of_layers=[1],
+                                    momentums=[0.01], initializers=[uniform], input_shapes=train.shape, verbose=False,
+                                    callbacks=[ea], output_activation='softmax', outputs=2
                                     )
 
 myval = HoldOut(models=myconfigurator, input=train, target=train_label, debug=True)
-config = myval.parallel_hold_out()
+config = myval.hold_out()
 
 ea = EarlyStoppingCallback(patience_limit=50)
-config['callbacks'] = [ea, 'wandb']
+config['callbacks'] = [ea]
 model = Composer(config=config).compose()
 
 print("Model found:", config)
-model.train(train, train_label, epochs=10000)
+model.train(train, train_label, epochs=100)
 
 res = model.evaluate(input=test, input_label=test_label)
 

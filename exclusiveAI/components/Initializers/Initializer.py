@@ -12,4 +12,4 @@ class Initializer:
 
     @staticmethod
     def ones(shape):
-        return np.ones(shape)
+        return np.eye(shape[0], shape[1], k=-1)
