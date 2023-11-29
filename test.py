@@ -14,6 +14,7 @@ from exclusiveAI.components.Initializers import *
 # from exclusiveAI.components.LossFunctions import *
 # from exclusiveAI.components.Callbacks import *
 import numpy as np
+
 #
 #
 # x1 = np.random.rand(100)
@@ -61,19 +62,19 @@ train = one_hot_encoding(train)
 test = np.array(test.values.tolist())
 test = one_hot_encoding(test)
 
-
-ea = EarlyStoppingCallback(patience_limit=50, metric='mse')
-values= [0.1, 0.01]
+ea = EarlyStoppingCallback(patience_limit=50)
+values = [0.001]
+values2 = [0.0001]
 
 uniform = Uniform(low=-1, high=1)
 
-myconfigurator = ConfiguratorGen(random=False, regularizations=values, learning_rates=values,
-                                    loss_functions=['mse'], optimizers=['sgd'],
-                                    activation_functions=['sigmoid'],
-                                    number_of_units=[1, 2, 3, 8, 10], number_of_layers=[1],
-                                    momentums=[0.01], initializers=[uniform], input_shapes=train.shape, verbose=False,
-                                    callbacks=[ea], output_activation='softmax', outputs=2
-                                    )
+myconfigurator = ConfiguratorGen(random=False, regularizations=values2, learning_rates=values,
+                                 loss_functions=['mse'], optimizers=['sgd'],
+                                 activation_functions=['sigmoid'],
+                                 number_of_units=[8, 10], number_of_layers=[1, 2],
+                                 momentums=[0.01], initializers=[uniform], input_shapes=train.shape, verbose=False,
+                                 callbacks=[ea], output_activation='sigmoid'
+                                 )
 
 myval = HoldOut(models=myconfigurator, input=train, target=train_label, debug=True)
 config = myval.hold_out()
@@ -83,17 +84,15 @@ config['callbacks'] = [ea]
 model = Composer(config=config).compose()
 
 print("Model found:", config)
-model.train(train, train_label, epochs=100)
+model.train(train, train_label, test, test_label, epochs=100)
 
 res = model.evaluate(input=test, input_label=test_label)
 
 print(res)
 
-prediction = model.predict(input=test)
+# prediction = model.predict(input=test)
 
 # prediction = 1 if x > 0.5 else 0
-prediction = np.round(prediction)
+# prediction = np.round(prediction)
 
-
-
-confusion_matrix(prediction, test_label)
+# confusion_matrix(prediction, test_label)

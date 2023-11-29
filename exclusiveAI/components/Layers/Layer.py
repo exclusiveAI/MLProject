@@ -61,3 +61,12 @@ class Layer:
         self.error = self.next.error @ self.next.weights[1:, :].T
         self.error = self.activation_func.derivative(self.nets) * self.error
         return np.dot(np.insert(self.prev.output, 0, 1, axis=-1).T, self.error)
+
+    def get_weights(self):
+        return self.weights
+
+    def get_error(self):
+        return self.error
+
+    def set_weights(self, weights):
+        self.weights = weights
