@@ -1,4 +1,4 @@
-__all__ = ['utils', 'train_split']
+__all__ = ['utils', 'train_split', 'confusion_matrix', 'one_hot_encoding']
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -62,3 +62,18 @@ def confusion_matrix(predicted, target):
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
     plt.savefig('res.png')
+
+
+def one_hot_encoding(y):
+    """
+    One hot encoding.
+    """
+    for column in y.T:
+        col_max = column.max()
+        new_col = np.zeros((len(column), col_max))
+        for i in range(len(column)):
+            new_col[i][column[i] - 1] = 1
+        column = new_col
+        y = np.hstack((y, column))
+        y = y[:, 1:]
+    return y

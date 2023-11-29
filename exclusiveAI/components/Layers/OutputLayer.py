@@ -22,12 +22,11 @@ class OutputLayer(Layer):
     def backpropagate(self, y_true: np.ndarray):
         if not self.is_initialized:
             raise Exception("Layer not initialized")
-
-        if y_true.shape != self.output.shape:
-            raise Exception("Different shapes", y_true.shape, self.output.shape)
+        if y_true.shape == (y_true.shape[0],):
+            y_true = y_true.reshape(-1, 1)
 
         # calculate the product between the error signal and incoming weights from current unit
         loss_btw_output_and_y_true = - self.loss_function.function_derivative(y_true, self.output)
-        self.error = self.activation_func.derivative(self.nets) * loss_btw_output_and_y_true
+        self.error = loss_btw_output_and_y_true * self.activation_func.derivative(self.nets)
 
         return np.dot(np.insert(self.prev.output, 0, 1, axis=-1).T, self.error)

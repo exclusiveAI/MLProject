@@ -13,10 +13,9 @@ class SGD(Optimizer):
     #     Gradient Descent algorithm
     def update(self, model, x, y_true):
         dw = self.calulate_deltas(model, y_true, x)
-
         if not self.old_dw:
             for layer, delta in zip(model.layers, dw):
-                layer.weights = layer.weights + delta * self.learning_rate - layer.weights * self.regularization * 2
+                layer.weights = layer.weights + self.learning_rate * delta - layer.weights * self.regularization * 2
             self.old_dw = dw
             return
 
