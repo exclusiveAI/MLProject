@@ -6,8 +6,9 @@ __all__ = ["Tanh"]
 
 class Tanh(ActivationFunction):
     def __init__(self):
+        tanh = lambda x: (np.exp(x) - np.exp(-x)) / (np.exp(x) + np.exp(-x))
         super().__init__(
             name="Tanh",
-            function=lambda x: np.tanh(x),
-            derivative=lambda x: 1 - np.tanh(x) ** 2,
+            function=tanh,
+            derivative=lambda x: np.ones(shape=x.shape) - np.square(tanh(x)),
         )

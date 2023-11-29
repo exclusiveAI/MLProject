@@ -34,3 +34,10 @@ class EarlyStoppingCallback:
         if self.patience > self.patience_limit:
             self.stop = True
             model.early_stop = True
+
+    def reset(self):
+        self.best_loss = float('inf')
+        self.best_epoch = 0
+        self.patience = 0
+        self.stop = False
+        self.metric = 'val_mse'

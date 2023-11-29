@@ -53,4 +53,4 @@ def calculate(func, target, predicted):
     func = MATCH[func]()
     if target.shape == (target.shape[0],):
         target = target.reshape(-1, 1)
-    return func(predicted, target)
+    return func(target, predicted)

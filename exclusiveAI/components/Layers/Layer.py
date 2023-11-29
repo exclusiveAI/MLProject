@@ -57,10 +57,17 @@ class Layer:
         if not self.is_initialized:
             raise Exception("Layer not initialized")
 
+        previous_output = np.insert(self.prev.output, 0, 1, axis=-1)  # adding bias to input
+
+        next_weights = self.next.weights[1:, :].T
+
         # calculate the product between the error signal and incoming weights from current unit
-        self.error = self.next.error @ self.next.weights[1:, :].T
-        self.error = self.activation_func.derivative(self.nets) * self.error
-        return np.dot(np.insert(self.prev.output, 0, 1, axis=-1).T, self.error)
+        self.error = self.next.error @ next_weights
+        self.error = self.error * self.activation_func.derivative(self.nets)
+
+        res = np.dot(previous_output.T, self.error)
+
+        return res
 
     def get_weights(self):
         return self.weights
