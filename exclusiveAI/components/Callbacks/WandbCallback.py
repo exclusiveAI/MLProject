@@ -26,3 +26,27 @@ class WandbCallback:
                 self.log_dict['train/' + name] = model.history[name][-1]
             self.log_dict['train/step'] = model.curr_epoch
         wandb.log(self.log_dict)
+
+    def reset(self):
+        self.log_dict = {}
+        self.log_list = []
+        wandb.log(self.log_dict)
+        self.run = wandb.run
+        self.project = wandb.run.project
+        self.config = wandb.config
+        wandb.define_metric("train/step")
+        # set all other train/ metrics to use this step
+        wandb.define_metric("train/*", step_metric="train/step")
+        wandb.define_metric("val/*", step_metric="train/step")
+
+    def close(self):
+        wandb.finish()
+        self.run = ''
+        self.project = None
+        self.config = None
+        self.log_dict = {}
+        self.log_list = []
+        wandb.define_metric("train/step")
+        # set all other train/ metrics to use this step
+        wandb.define_metric("train/*", step_metric="train/step")
+        wandb.define_metric("val/*", step_metric="train/step")

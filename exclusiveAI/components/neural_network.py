@@ -13,6 +13,7 @@ class neural_network:
                  callbacks: list,
                  metrics: [],
                  verbose: bool = False,
+                 shuffle: bool = True
                  ):
         self.optimizer = optimizer
         self.callbacks = callbacks
@@ -23,6 +24,7 @@ class neural_network:
         self.curr_epoch = 0
         self.metrics = metrics
         self.history = {}
+        self.shuffle = shuffle
 
         self.initialize()
 
@@ -36,14 +38,15 @@ class neural_network:
               input_label: np.array,
               val: np.array = None,
               val_labels: np.array = None,
-              epochs=1000, batch_size=32, name:str='', thread: int=0):
+              epochs=100, batch_size=32, name:str='', thread: int=0):
         # check if both val and val_label are provided
         if val is not None and val_labels is not None:
             # check if val and val_label have the same shape
             if val.shape[0] != val_labels.shape[0]:
                 raise ValueError("val and val_label must have the same shape")
         MetricUtils.initializeHistory(self, val is not None)
-
+        for callback in self.callbacks:
+            callback.reset()
         with tqdm(total=epochs, position=thread, desc="Epochs", colour="white") as pbar:
             for epoch in range(epochs):
                 output = self.predict(inputs)
@@ -61,6 +64,10 @@ class neural_network:
 
                 self.curr_epoch += 1
 
+                if self.shuffle:
+                    perm = np.random.permutation(inputs.shape[0])
+                    inputs = np.take(inputs, perm, axis=0)
+                    input_label = np.take(input_label, perm, axis=0)
                 batches = utils.split_batches(inputs, input_label, batch_size)
                 for (batch, batch_label) in batches:
                     self.optimizer.update(self, batch, batch_label)
@@ -86,3 +93,13 @@ class neural_network:
     def evaluate(self, input: np.array, input_label: np.array):
         output = self.predict(input)
         return MetricUtils.calculate('mse', target=input_label, predicted=output),  MetricUtils.calculate('binary_accuracy', target=input_label, predicted=output)
+
+    def get_weights(self):
+        weights = []
+        for layer in self.layers:
+            weights.append(layer.get_weights())
+        return weights
+
+    def set_weights(self, weights: list):
+        for layer, weight in zip(self.layers, weights):
+            layer.set_weights(weight)

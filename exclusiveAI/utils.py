@@ -68,6 +68,12 @@ def one_hot_encoding(y):
     """
     One hot encoding.
     """
-    tmp_y = np.array(y).astype('int64')
-    return np.array(np.eye(np.max(tmp_y))[tmp_y - 1]).reshape(-1, y.shape[-1] * np.max(tmp_y))
-
+    for column in y.T:
+        col_max = column.max()
+        new_col = np.zeros((len(column), col_max))
+        for i in range(len(column)):
+            new_col[i][column[i] - 1] = 1
+        column = new_col
+        y = np.hstack((y, column))
+        y = y[:, 1:]
+    return y
