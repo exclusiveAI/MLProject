@@ -6,8 +6,9 @@ __all__ = ["Sigmoid"]
 
 class Sigmoid(ActivationFunction):
     def __init__(self):
+        sigmoid = lambda x: np.ones(x.shape) / (np.ones(x.shape) + np.exp(-x))
         super().__init__(
             name="Sigmoid",
-            function=lambda x: 1 / (1 + np.exp(-x)),
-            derivative=lambda x: self.function(x) * (1 - self.function(x))
+            function= sigmoid,
+            derivative=lambda x: sigmoid(x) * (np.ones(x.shape) - sigmoid(x))
         )
