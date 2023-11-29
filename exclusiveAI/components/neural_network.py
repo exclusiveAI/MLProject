@@ -85,4 +85,4 @@ class neural_network:
 
     def evaluate(self, input: np.array, input_label: np.array):
         output = self.predict(input)
-        return MetricUtils.calculate('mse', target=input_label, predicted=output)
+        return MetricUtils.calculate('mse', target=input_label, predicted=output),  MetricUtils.calculate('binary_accuracy', target=input_label, predicted=output)

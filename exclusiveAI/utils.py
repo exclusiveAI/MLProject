@@ -68,5 +68,6 @@ def one_hot_encoding(y):
     """
     One hot encoding.
     """
-    return np.array(np.eye(np.max(y))[y - 1]).reshape(-1, y.shape[-1] * np.max(y))
+    tmp_y = np.array(y).astype('int64')
+    return np.array(np.eye(np.max(tmp_y))[tmp_y - 1]).reshape(-1, y.shape[-1] * np.max(tmp_y))
 
