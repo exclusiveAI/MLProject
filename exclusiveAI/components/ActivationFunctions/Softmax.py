@@ -5,6 +5,9 @@ from .ActivationFunction import ActivationFunction
 
 
 class Softmax(ActivationFunction):
+    """
+    Softmax activation function.
+    """
     def __init__(self):
         super().__init__(
             name="Softmax",
