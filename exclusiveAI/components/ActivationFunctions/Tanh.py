@@ -5,6 +5,9 @@ __all__ = ["Tanh"]
 
 
 class Tanh(ActivationFunction):
+    """
+    Tanh activation function.
+    """
     def __init__(self):
         tanh = lambda x: (np.exp(x) - np.exp(-x)) / (np.exp(x) + np.exp(-x))
         super().__init__(

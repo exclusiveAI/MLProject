@@ -5,6 +5,9 @@ __all__ = ["ReLU"]
 
 
 class ReLU(ActivationFunction):
+    """
+    ReLU activation function.
+    """
     def __init__(self) -> None:
         super().__init__(
             name="ReLU",
