@@ -5,6 +5,9 @@ __all__ = ["MeanSquaredError"]
 
 
 class MeanSquaredError(LossFunction):
+    """
+    Mean Squared Error loss function.
+    """
     def __init__(self):
         super().__init__(
             name="Mean Squared Error",
