@@ -1,7 +1,7 @@
 from exclusiveAI.ConfiguratorGen import ConfiguratorGen
 from exclusiveAI.Composer import Composer
 from exclusiveAI.components.Validation import *
-from exclusiveAI.components.Callbacks import *
+from exclusiveAI.components.CallBacks import *
 from exclusiveAI.datasets.monk import read_monk1
 from exclusiveAI.utils import confusion_matrix, one_hot_encoding
 from exclusiveAI.components.Initializers import *
@@ -69,7 +69,7 @@ values2 = [0.0001, 0.001]
 uniform = Uniform(low=-0.5, high=0.5)
 
 myconfigurator = ConfiguratorGen(random=False, regularizations=values2, learning_rates=values,
-                                 loss_functions=['mse'], optimizers=['sgd'],
+                                 loss_functions=['mse'], optimizer=['sgd'],
                                  activation_functions=['sigmoid'],
                                  number_of_units=[10], number_of_layers=[1, 2],
                                  momentums=[0.9], initializers=[uniform], input_shapes=train.shape, verbose=False,

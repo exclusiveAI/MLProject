@@ -5,6 +5,9 @@ __all__ = ["Sigmoid"]
 
 
 class Sigmoid(ActivationFunction):
+    """
+    Sigmoid activation function.
+    """
     def __init__(self):
         sigmoid = lambda x: np.ones(x.shape) / (np.ones(x.shape) + np.exp(-x))
         super().__init__(

@@ -5,6 +5,20 @@ import numpy as np
 
 
 class InputLayer(Layer):
+    """
+    Specialization of the Layer class to represent an input layer.
+
+    Args:
+        input_len (int): The length of the input.
+        units (int): The number of units in the layer.
+    Attributes:
+        units (int): The number of units in the layer.
+        initializer (Initializer): The initializer to use.
+        is_trainable (bool): Whether the layer is trainable or not.
+        activation_func (ActivationFunction): The activation function to use.
+        input_len (int): The length of the input.
+        input (np.ndarray): The input to the layer.
+    """
     def __init__(self, input_len, units: int):
         super().__init__(
             units=units,
@@ -40,6 +54,7 @@ class InputLayer(Layer):
         self.input = input
         local_input = input
 
+        #NOTE: this layer simply uses the local input as nets and an identity function as activation function
         self.nets = local_input # calculate the net input for current unit
         self.output = self.activation_func.function(self.nets)
         return self.input
