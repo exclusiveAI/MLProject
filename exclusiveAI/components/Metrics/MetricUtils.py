@@ -3,7 +3,7 @@ from . import MEE
 from . import MSE
 from . import BinaryAccuracy
 
-__all__ = ["stringToMetric", "initializeHistory", "addToHistory", "printHistory", "calculate"]
+__all__ = ["string_to_metric", "initialize_history", "add_to_history", "print_history", "calculate"]
 
 MATCH = {
     "mse": MSE,
@@ -13,7 +13,15 @@ MATCH = {
 }
 
 
-def stringToMetric(name):
+def string_to_metric(name):
+    """
+    Args:
+        name (str): name of the metric.
+    Raises:
+        ValueError: the input string doesn't match any available metric.
+    Returns:
+        object (Metric): returns a metric matching the input string.
+    """
     if name.lower() in MATCH:
         return MATCH[name.lower()]()
     else:
@@ -21,8 +29,14 @@ def stringToMetric(name):
         raise ValueError("Unknown metric name: " + name)
 
 
-def initializeHistory(model, val: bool):
-    model.metrics = [stringToMetric(metric) if isinstance(metric, str) else metric for metric in model.metrics]
+def initialize_history(model, val: bool):
+    """
+    Initializes the metric history of a given model.
+    Args:
+        model: the model for which to initialize the history.
+        val: true if you want to add validation metrics too.
+    """
+    model.metrics = [string_to_metric(metric) if isinstance(metric, str) else metric for metric in model.metrics]
     model.history = {}
     for metric in model.metrics:
         model.history[metric.name] = []
@@ -30,7 +44,16 @@ def initializeHistory(model, val: bool):
             model.history["val_" + metric.name] = []
 
 
-def addToHistory(model, y_train_pred, y_train_true, y_val_pred, y_val_true):
+def add_to_history(model, y_train_pred, y_train_true, y_val_pred, y_val_true):
+    """
+    Calculates and adds to the history of a given model the metrics calculated on the training and validation (if specified) data.
+    Args:
+        model: the model for which to add the metric to its history
+        y_train_pred: predicted value by the model for TR
+        y_train_true: corresponding target value
+        y_val_pred: predicted value by the model for VL
+        y_val_true: corresponding target value
+    """
     for metric in model.metrics:
         y_train_true = y_train_true.reshape(-1, 1)
         model.history[metric.name].append(metric(y_train_true, y_train_pred))
@@ -39,7 +62,13 @@ def addToHistory(model, y_train_pred, y_train_true, y_val_pred, y_val_true):
             model.history['val_' + metric.name].append(metric(y_val_true, y_val_pred))
 
 
-def printHistory(model, val: bool):
+def print_history(model, val: bool):
+    """
+    Prints the history of a given model
+    Args:
+        model: the given model for which to print the metrics history
+        val: true if you want to print the validation metrics too
+    """
     for metric in model.history:
         print(metric, model.history[metric])
         if val:
@@ -47,6 +76,17 @@ def printHistory(model, val: bool):
 
 
 def calculate(func, target, predicted):
+    """
+    Calculates the metrics specified by the input string.
+    Args:
+        func (str): the metric name
+        target: target value
+        predicted: predicted value by the model
+
+    Raises:
+        ValueError: if the metric name is unknown
+
+    """
     func = func.lower()
     if func not in MATCH:
         raise ValueError("Unknown metric name: " + func)

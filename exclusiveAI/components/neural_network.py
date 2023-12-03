@@ -44,7 +44,7 @@ class neural_network:
             # check if val and val_label have the same shape
             if val.shape[0] != val_labels.shape[0]:
                 raise ValueError("val and val_label must have the same shape")
-        MetricUtils.initializeHistory(self, val is not None)
+        MetricUtils.initialize_history(self, val is not None)
         for callback in self.callbacks:
             callback.reset()
         with tqdm(total=epochs, position=thread, desc="Epochs", colour="white") as pbar:
@@ -55,7 +55,7 @@ class neural_network:
                 if val is not None:
                     val_output = self.predict(val)
 
-                MetricUtils.addToHistory(self, output, input_label, val_output, val_labels)
+                MetricUtils.add_to_history(self, output, input_label, val_output, val_labels)
                 for callback in self.callbacks:
                     callback(self)
 
