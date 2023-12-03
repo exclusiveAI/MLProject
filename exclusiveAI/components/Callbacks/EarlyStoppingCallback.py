@@ -1,8 +1,11 @@
 __all__ = ['EarlyStoppingCallback']
-from ..neural_network import neural_network
+from ..NeuralNetwork import NeuralNetwork
 
 
 class EarlyStoppingCallback:
+    """
+    Implements early stopping
+    """
     def __init__(self, patience_limit: int = 3, metric: str='val_mse'):
 
         self.best_loss = float('inf')
@@ -12,7 +15,7 @@ class EarlyStoppingCallback:
         self.metric = metric
         self.stop = False
 
-    def __call__(self, model: neural_network):
+    def __call__(self, model: NeuralNetwork):
         if self.metric=='val_mse':
             # check if val_mse in history
             if 'val_mse' not in model.history:

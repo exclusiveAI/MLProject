@@ -69,7 +69,7 @@ values2 = [0.0001, 0.001]
 uniform = Uniform(low=-0.5, high=0.5)
 
 myconfigurator = ConfiguratorGen(random=False, regularizations=values2, learning_rates=values,
-                                 loss_functions=['mse'], optimizers=['sgd'],
+                                 loss_functions=['mse'], optimizer=['sgd'],
                                  activation_functions=['sigmoid'],
                                  number_of_units=[10], number_of_layers=[1, 2],
                                  momentums=[0.9], initializers=[uniform], input_shapes=train.shape, verbose=False,
