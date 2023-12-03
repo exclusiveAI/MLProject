@@ -1,10 +1,10 @@
 from exclusiveAI.components.ActivationFunctions import *
 from exclusiveAI.components.LossFunctions import *
 from exclusiveAI.components.Initializers import *
-from exclusiveAI.components.Callbacks import *
+from exclusiveAI.components.CallBacks import *
 from exclusiveAI.components.Optimizers import *
 from exclusiveAI.components.Layers import *
-from exclusiveAI import neural_network
+from exclusiveAI.components import NeuralNetwork
 
 InitializersNames = {
     'gaussian': Gaussian,
@@ -40,6 +40,26 @@ OptimizersNames = {
 
 
 class Composer:
+    """
+    Compose the building block to build the model.
+    Args:
+        regularization (float): The regularization parameter to be used for the model.
+        learning_rate (float): The learning rate to be used for the model.
+        loss_function (str): The loss function to be used for the model.
+        activation_functions (list): The activation functions to be used for the model.
+        num_of_units (list): The number of units in each layer.
+        num_layers (int): The number of layers in the model.
+        momentum (float): The momentum parameter to be used for the model.
+        optimizer (str): The optimizer to be used for the model.
+        initializers (list): The initializers to be used for the model.
+        input_shape (tuple): The input shape of the model.
+        callbacks (list): The callbacks to be used for the model.
+        verbose (bool): Whether to print out the progress of the model.
+        outputs (int): The number of outputs of the model.
+        config (dict): The configuration of the model. Note: you can take a config dict in input to build the model instead of each single param.
+    Attributes:
+
+    """
     def __init__(self,
                  regularization: float = None,
                  learning_rate: float = None,
@@ -68,7 +88,7 @@ class Composer:
             num_layers = config.get('num_layers', num_layers)
             momentum = config.get('momentum', momentum)
             optimizer = config.get('optimizer', optimizer)
-            initializers= config.get('initializers', initializers)
+            initializers = config.get('initializers', initializers)
             callbacks = config.get('callbacks', callbacks)
             verbose = config.get('verbose', verbose)
             outputs = config.get('outputs', outputs)
@@ -152,6 +172,11 @@ class Composer:
         self.verbose = verbose
 
     def compose(self):
+        """
+        Compose the building block to build the model.
+        Returns:
+            model: The model composed.
+        """
         layers = []
         input_layer = InputLayer(self.input_shape[0], self.input_shape[-1])
         layers.append(input_layer)
@@ -162,10 +187,10 @@ class Composer:
                                    initializer=self.initializers[-1], loss_function=self.loss_function)
         layers.append(output_layer)
 
-        model = neural_network.neural_network(optimizer=self.optimizer,
-                                              callbacks=self.callbacks,
-                                              metrics=['mse', 'mae', 'mee', 'binary_accuracy'],
-                                              layers=layers,
-                                              verbose=self.verbose)
+        model = NeuralNetwork.NeuralNetwork(optimizer=self.optimizer,
+                                             callbacks=self.callbacks,
+                                             metrics=['mse', 'mae', 'mee', 'binary_accuracy'],
+                                             layers=layers,
+                                             verbose=self.verbose)
 
         return model

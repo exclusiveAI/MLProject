@@ -1,6 +1,6 @@
 import numpy as np
 
-from ..neural_network import neural_network
+from ..NeuralNetwork import NeuralNetwork
 from exclusiveAI.ConfiguratorGen import ConfiguratorGen
 
 __all__ = ["KFoldCrossValidation"]
@@ -21,7 +21,7 @@ class KFoldCrossValidation:
         random_state (int): random seed
         configurator (ConfiguratorGen): a particular model configuration (i.e. hyperparameters config.)
         best_config (dict): the best configuration found
-        best_model (neural_network): the best model found
+        best_model (NeuralNetwork): the best model found
     """
     def __init__(self, n_splits=5, shuffle=True, random_state=None, configurator: ConfiguratorGen = None):
         self.n_splits = n_splits

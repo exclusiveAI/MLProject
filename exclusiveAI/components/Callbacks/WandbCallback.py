@@ -4,6 +4,9 @@ import wandb
 
 
 class WandbCallback:
+    """
+    Wandb callback to log metrics
+    """
     def __init__(self, run_name, project='exclusiveAI', config=None):
         self.name = 'wandb'
         self.run = ''

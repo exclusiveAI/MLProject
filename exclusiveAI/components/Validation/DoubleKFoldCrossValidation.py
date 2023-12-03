@@ -1,6 +1,6 @@
 from .KFoldCrossValidation import KFoldCrossValidation
 from exclusiveAI.ConfiguratorGen import ConfiguratorGen
-from ..neural_network import neural_network
+from ..NeuralNetwork import NeuralNetwork
 import numpy as np
 
 __all__ = ['DoubleKFoldCrossValidation']
