@@ -1,7 +1,7 @@
 from exclusiveAI.ConfiguratorGen import ConfiguratorGen
 from exclusiveAI.Composer import Composer
 from exclusiveAI.components.Validation import *
-from exclusiveAI.components.Callbacks import *
+from exclusiveAI.components.CallBacks import *
 from exclusiveAI.datasets.monk import read_monk1
 from exclusiveAI.utils import confusion_matrix, one_hot_encoding
 from exclusiveAI.components.Initializers import *
