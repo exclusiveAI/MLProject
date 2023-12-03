@@ -6,7 +6,30 @@ from exclusiveAI import utils
 from tqdm import tqdm
 
 
-class neural_network:
+class NeuralNetwork:
+    """
+    This class is used to create a neural network model.
+
+    Args:
+
+        layers (list): A list of layers to be added to the model.
+        optimizer (Optimizer): The optimizer to be used for training.
+        callbacks (list): A list of callbacks to be used during training.
+        metrics (list): A list of metrics to be used during training.
+        verbose (bool): Whether to print out the progress of the model.
+        shuffle (bool): Whether to shuffle the data before training.
+    Attrubutes:
+
+        optimizer (Optimizer): The optimizer to be used for training.
+        callbacks (list): A list of callbacks to be used during training.
+        layers (list): A list of layers to be added to the model.
+        verbose (bool): Whether to print out the progress of the model.
+        early_stop (bool): Whether to use early stopping as stopping criteria.
+        name (str): The name of the model.
+        curr_epoch (int): The current epoch of the model.
+        metrics (list): A list of metrics to be used during training.
+        history (dict): A dictionary containing the training history metrics.
+    """
     def __init__(self,
                  layers: list,
                  optimizer: Optimizer,
@@ -29,6 +52,9 @@ class neural_network:
         self.initialize()
 
     def initialize(self):
+        """
+        Initialize the layers of the model
+        """
         self.layers[0].initialize(name='Input', verbose=self.verbose)
         for i, layer in enumerate(self.layers[1:]):
             layer.initialize(self.layers[i], name=('Layer' + str(i)), verbose=self.verbose)
@@ -39,12 +65,27 @@ class neural_network:
               val: np.array = None,
               val_labels: np.array = None,
               epochs=100, batch_size=32, name:str='', thread: int=0):
+        """
+        Perform the model training on input data and label.
+
+        Args:
+            inputs (np.array): the input data
+            input_label (np.array) the label data
+            val (np.array): the validation data
+            val_labels (no.array): the validation data label
+            epochs (int): the number of epochs
+            batch_size (int): the size of a batch used in minibatch approach
+            thread (int): number of thread to be used
+
+        Returns: training history
+
+        """
         # check if both val and val_label are provided
         if val is not None and val_labels is not None:
             # check if val and val_label have the same shape
             if val.shape[0] != val_labels.shape[0]:
                 raise ValueError("val and val_label must have the same shape")
-        MetricUtils.initializeHistory(self, val is not None)
+        MetricUtils.initialize_history(self, val is not None)
         for callback in self.callbacks:
             callback.reset()
         with tqdm(total=epochs, position=thread, desc="Epochs", colour="white") as pbar:
@@ -55,7 +96,7 @@ class neural_network:
                 if val is not None:
                     val_output = self.predict(val)
 
-                MetricUtils.addToHistory(self, output, input_label, val_output, val_labels)
+                MetricUtils.add_to_history(self, output, input_label, val_output, val_labels)
                 for callback in self.callbacks:
                     callback(self)
 
@@ -80,9 +121,21 @@ class neural_network:
         return self.history
 
     def get_last(self):
+        """
+        Get the last element of the history.
+        Returns: the last element of the history.
+        """
         return {name: self.history[name][-1] for name in self.history}
 
     def predict(self, input: np.array):
+        """
+        Apply the feedforward across layers to the input data.
+        Args:
+            input:
+
+        Returns:
+
+        """
         input = input
         output = None
         for layer in self.layers:
@@ -91,6 +144,14 @@ class neural_network:
         return output
 
     def evaluate(self, input: np.array, input_label: np.array):
+        """
+        Apply the predict and calculate the metrics on prediction.
+        Args:
+            input: input data
+            input_label: input label
+
+        Returns: metrics on prediction
+        """
         output = self.predict(input)
         return MetricUtils.calculate('mse', target=input_label, predicted=output),  MetricUtils.calculate('binary_accuracy', target=input_label, predicted=output)
 

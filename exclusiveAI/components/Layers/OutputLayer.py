@@ -7,6 +7,21 @@ from exclusiveAI.components.LossFunctions import LossFunction
 
 
 class OutputLayer(Layer):
+    """
+    Specialization of the Layer class to represent an output layer.
+    Args:
+
+        activation_function: Activation function to use.
+        units: Number of units in the layer.
+        initializer: Initializer to use.
+        loss_function: Loss function to use.
+
+    Attributes:
+        initializer:  Initializer to use.
+        activation_func: Activation function to use.
+        units: Number of units in the layer.
+        loss_function: Loss function to use.
+    """
     def __init__(self, activation_function: ActivationFunction, units: int, initializer: Initializer,
                  loss_function: LossFunction):
         super().__init__(
@@ -22,6 +37,8 @@ class OutputLayer(Layer):
     def backpropagate(self, y_true: np.ndarray):
         if not self.is_initialized:
             raise Exception("Layer not initialized")
+
+        # check if y_true shape is n,1
         if y_true.shape == (y_true.shape[0],):
             y_true = y_true.reshape(-1, 1)
 
