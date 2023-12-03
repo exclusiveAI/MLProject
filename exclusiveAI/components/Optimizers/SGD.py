@@ -5,13 +5,29 @@ from exclusiveAI.components.ActivationFunctions import ActivationFunction
 
 
 class SGD(Optimizer):
+    """
+    Stochastic Gradient Descent algorithm
+    Args:
+        momentum (float): momentum parameter
+        learning_rate (float): learning rate parameter
+        regularization (float): regularization parameter
+    Attributes:
+        momentum (float): momentum parameter
+        learning_rate (float): learning rate parameter
+    """
     def __init__(self, momentum: float, learning_rate: float, regularization: float):
         super().__init__(learning_rate=learning_rate)
         self.momentum = momentum
         self.regularization = regularization
 
-    #     Gradient Descent algorithm
     def update(self, model, x, y_true):
+        """
+        The algorithm.
+        Args:
+            model: current model
+            x: input
+            y_true: target
+        """
         dw = self.calulate_deltas(model, y_true, x)
         if not self.old_dw:
             for layer, delta in zip(model.layers, dw):
