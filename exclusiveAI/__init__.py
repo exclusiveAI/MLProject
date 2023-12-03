@@ -4,6 +4,6 @@ from exclusiveAI.components import Optimizers
 from exclusiveAI.components import Initializers
 from exclusiveAI.components import NeuralNetwork
 from exclusiveAI.components import Layers
-from exclusiveAI.components import Callbacks
+from exclusiveAI.components import CallBacks
 from exclusiveAI.components import Metrics
 from exclusiveAI import utils
