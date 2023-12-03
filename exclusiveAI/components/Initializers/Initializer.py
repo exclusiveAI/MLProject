@@ -14,15 +14,3 @@ class Initializer:
 
     def initialize(self, shape):
         pass
-
-    @staticmethod
-    def ones(shape):
-        """
-        #TODO
-        Args:
-            shape:
-
-        Returns:
-
-        """
-        return np.eye(shape[0], shape[1], k=-1)

@@ -81,7 +81,7 @@ class Layer:
             The error of the layer is initialized to None.
             The nets of the layer are initialized to None.
         """
-        self.weights = self.initializer.initialize(shape=(prev.units + 1, self.units)) #TODO
+        self.weights = self.initializer.initialize(shape=(prev.units + 1, self.units))
         self.name = name
         prev.next = self
         self.prev = prev
