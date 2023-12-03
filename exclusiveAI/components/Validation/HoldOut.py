@@ -2,6 +2,29 @@ from exclusiveAI.utils import train_split
 from exclusiveAI.ConfiguratorGen import ConfiguratorGen
 from joblib import Parallel, delayed
 class HoldOut:
+    """
+    Hold-out
+    Args:
+        models (ConfiguratorGen): a set of models
+        input (np.ndarray): input data
+        target (np.ndarray): target data
+        split_size (float): split size
+        shuffle (bool):  true to shuffle data
+        seed (int): seed for the random shuffling
+        assessment (bool): true to perform model assessment
+        debug (bool): true to print debug information
+    Attributes:
+        best_model (neural_network): the best model found
+        best_config (dict): the best configuration found
+        models (ConfiguratorGen): a set of models
+        input (np.ndarray): input data
+        target (np.ndarray): target data
+        split_size (float): split size
+        shuffle (bool):  true to shuffle data
+        seed (int): seed for the random shuffling
+        assessment (bool): true to perform model assessment
+        debug (bool): true to print debug information
+    """
     def __init__(self, models: ConfiguratorGen, input, target, split_size=0.2, shuffle=True, seed=42,
                  assessment: bool = False, debug=False):
         self.best_model = None
@@ -16,6 +39,11 @@ class HoldOut:
         self.debug = debug
 
     def split(self):
+        """
+        Split the data into TR and VL/TS
+        Returns: TR and VL/TS splits with their target values sets
+
+        """
         train, train_target, validation, validation_target, _, _ = train_split(inputs=self.input,
                                                                                      input_label=self.target,
                                                                                      split_size=self.split_size,
@@ -24,6 +52,14 @@ class HoldOut:
         return train, train_target, validation, validation_target
 
     def hold_out(self, metric: str=None):
+        """
+        The hold out algorithm
+        Args:
+            metric: metric to use (e.g, mse)
+
+        Returns: best configuration for the validation task or model assessment for the test task.
+
+        """
         metric = 'val_mse' if self.assessment else 'mse' if metric is None else metric
         train, train_target, validation, validation_target = self.split()
         for model, config in self.models:
