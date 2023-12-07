@@ -44,12 +44,3 @@ class WandbCallback:
 
     def close(self):
         wandb.finish()
-        self.run = ''
-        self.project = None
-        self.config = None
-        self.log_dict = {}
-        self.log_list = []
-        wandb.define_metric("train/step")
-        # set all other train/ metrics to use this step
-        wandb.define_metric("train/*", step_metric="train/step")
-        wandb.define_metric("val/*", step_metric="train/step")

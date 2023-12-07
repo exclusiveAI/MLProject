@@ -35,7 +35,6 @@ ActivationFunctionsNames = {
 OptimizersNames = {
     'sgd': SGD,
     'adam': Adam,
-    'nesterovsgd': NesterovSGD,
 }
 
 
@@ -69,10 +68,11 @@ class Composer:
                  num_layers: int = None,
                  momentum: float = None,
                  optimizer: str = None,
-                 # beta1: float = None,
-                 # beta2: float = None,
+                 nesterov: bool=False,
+                 beta1: float = None,
+                 beta2: float = None,
                  initializers=None,
-                 # eps: float = None,
+                 eps: float = None,
                  input_shape=None,
                  callbacks=None,
                  verbose=False,
@@ -81,6 +81,9 @@ class Composer:
                  ):
         if config is not None:
             regularization = config.get('regularization', regularization)
+            beta1 = config.get('beta1', beta1)
+            beta2 = config.get('beta2', beta2)
+            eps = config.get('eps', eps)
             learning_rate = config.get('learning_rate', learning_rate)
             loss_function = config.get('loss_function', loss_function)
             activation_functions = config.get('activation_functions', activation_functions)
@@ -93,7 +96,6 @@ class Composer:
             verbose = config.get('verbose', verbose)
             outputs = config.get('outputs', outputs)
             input_shape = config.get('input_shape', input_shape)
-        self.optimizer = optimizer
         if input_shape is None:
             # Error can't initialize
             raise ValueError("Parameter input_shape can't be None")
@@ -104,13 +106,7 @@ class Composer:
         if len(num_of_units) != num_layers:
             raise ValueError("Parameter num_of_units must have the same length as num_layers")
         if optimizer is None:
-            if learning_rate is None:
-                learning_rate = 0.01
-            if regularization is None:
-                regularization = 0.01
-            if momentum is None:
-                momentum = 0.9
-            optimizer = SGD(learning_rate=learning_rate, momentum=momentum, regularization=regularization)
+            optimizer = SGD()
         if initializers is None:
             initializers = [Gaussian()]
         if callbacks is None:
@@ -158,13 +154,19 @@ class Composer:
         self.activation_functions = [ActivationFunctionsNames[activation_function.lower()]()
                                     if isinstance(activation_function, str) else activation_function
                                     for activation_function in activation_functions]
-        if (learning_rate is None or regularization is None or momentum is None and isinstance(optimizer, str) and
-                (optimizer.lower() == 'sgd' or optimizer.lower() == 'nesterovsgd')):
-            raise ValueError("Parameters learning_rate, regularization and momentum can't be None if Optimizer: ",
-                            optimizer)
-        else:
-            self.optimizer = OptimizersNames[optimizer.lower()](learning_rate=learning_rate, regularization=regularization, momentum=momentum) \
-                if isinstance(optimizer, str) else optimizer
+        
+        
+        self.optimizer = OptimizersNames[optimizer.lower()](regularization=regularization, 
+                                                            learning_rate=learning_rate, 
+                                                            momentum=momentum, 
+                                                            nesterov=nesterov, 
+                                                            beta1=beta1, 
+                                                            beta2=beta2, 
+                                                            eps=eps
+                                                            ) \
+        if isinstance(optimizer, str) else optimizer
+                
+                
         self.num_of_units = num_of_units
         self.input_shape = input_shape
         self.num_layers = num_layers

@@ -14,9 +14,7 @@ class Optimizer:
         lr_scheduler (LearningRateScheduler): learning rate scheduler
         old_dw (list): list of old deltas of weights
     """
-    # def __init__(self, learning_rate: float, regularization: float, activation_func: ActivationFunction, lr_scheduler: LearningRateScheduler):
-    def __init__(self, learning_rate: float, lr_scheduler=None):
-        self.learning_rate = learning_rate
+    def __init__(self, lr_scheduler=None, **kwargs):
         self.lr_scheduler = lr_scheduler
         self.old_dw = []
 

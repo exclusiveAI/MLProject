@@ -101,6 +101,7 @@ class NeuralNetwork:
                     callback(self)
 
                 if self.early_stop:
+                    [callback.close() for callback in self.callbacks]
                     break
 
                 self.curr_epoch += 1

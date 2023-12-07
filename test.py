@@ -63,16 +63,16 @@ test = np.array(test.values.tolist())
 test = one_hot_encoding(test)
 
 ea = EarlyStoppingCallback(patience_limit=10)
-values = [0.1, 0.01, 0.05, 0.5]
-values2 = [0.0001, 0.001]
+values = [0.1, 0.2, 0.3, 0.4, 0.5]
+values2 = [0.0001, 0.001, 0.01, 0]
 
-uniform = Uniform(low=-0.5, high=0.5)
+uniform = Uniform(low=-1, high=1)
 
 myconfigurator = ConfiguratorGen(random=False, regularizations=values2, learning_rates=values,
                                  loss_functions=['mse'], optimizer=['sgd'],
                                  activation_functions=['sigmoid'],
-                                 number_of_units=[10], number_of_layers=[1, 2],
-                                 momentums=[0.9], initializers=[uniform], input_shapes=train.shape, verbose=False,
+                                 number_of_units=[2, 3, 4], number_of_layers=[1],
+                                 momentums=[0.9, 0.4, 0.1], initializers=[uniform], input_shapes=train.shape, verbose=False,
                                  callbacks=[ea], output_activation='sigmoid'
                                  )
 
@@ -84,7 +84,7 @@ config['callbacks'] = [ea, 'wandb']
 model = Composer(config=config).compose()
 
 print("Model found:", config)
-model.train(train, train_label, test, test_label, epochs=100)
+model.train(train, train_label, test, test_label, epochs=1000)
 
 res = model.evaluate(input=test, input_label=test_label)
 
