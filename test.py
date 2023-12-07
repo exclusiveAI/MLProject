@@ -62,24 +62,24 @@ train = one_hot_encoding(train)
 test = np.array(test.values.tolist())
 test = one_hot_encoding(test)
 
-ea = EarlyStoppingCallback(patience_limit=100)
-values = [0.001, 0.0001]
-values2 = [0.0001, 0.001]
+ea = EarlyStoppingCallback(patience_limit=10)
+values = [0.1, 0.2, 0.3, 0.4, 0.5]
+values2 = [0.0001, 0.001, 0.01, 0]
 
 uniform = Uniform(low=-1, high=1)
 
 myconfigurator = ConfiguratorGen(random=False, regularizations=values2, learning_rates=values,
                                  loss_functions=['mse'], optimizer=['sgd'],
                                  activation_functions=['sigmoid'],
-                                 number_of_units=[10], number_of_layers=[1, 2, 3],
-                                 momentums=[0.9, 0.5, 0.1, 0.01], initializers=[uniform], input_shapes=train.shape, verbose=False,
+                                 number_of_units=[2, 3, 4], number_of_layers=[1],
+                                 momentums=[0.9, 0.4, 0.1], initializers=[uniform], input_shapes=train.shape, verbose=False,
                                  callbacks=[ea], output_activation='sigmoid'
                                  )
 
 myval = HoldOut(models=myconfigurator, input=train, target=train_label, debug=True)
 config = myval.hold_out()
 
-ea = EarlyStoppingCallback(patience_limit=100)
+ea = EarlyStoppingCallback(patience_limit=10)
 config['callbacks'] = [ea, 'wandb']
 model = Composer(config=config).compose()
 
