@@ -78,12 +78,15 @@ class HoldOut:
                         if model.get_last()[metric] < ith_model.get_last()[metric]:
                             self.best_models.insert(i, model)
                             self.best_configs.insert(i, config)
+                    if len(self.best_models) > 10:
+                        self.best_models = self.best_models[:10]
+                        self.best_configs = self.best_configs[:10]
                 else:
-                    if model.get_last()[metric] > self.best_models[0].get_last()[metric]:
+                    if model.get_last()[metric] < self.best_models[0].get_last()[metric]:
                         self.best_models[0] = model
                         self.best_configs[0] = config
-            if len(self.best_models) > 50:
-                self.best_models = self.best_models[:50]
+        if all_models:
+            return [model.evaluate(validation, validation_target) for model in self.best_models] if self.assessment else self.best_configs
         return self.best_models[0].evaluate(validation, validation_target) if self.assessment else self.best_configs[0]
 
     def process(self, chunk, train, train_target, validation, validation_target, metric, i):
