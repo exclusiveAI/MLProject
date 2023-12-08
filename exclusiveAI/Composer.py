@@ -29,7 +29,7 @@ ActivationFunctionsNames = {
     'tanh': Tanh,
     'relu': ReLU,
     'linear': Linear,
-    'softmax':  Softmax,
+    'softmax': Softmax,
 }
 
 OptimizersNames = {
@@ -59,6 +59,7 @@ class Composer:
     Attributes:
 
     """
+
     def __init__(self,
                  regularization: float = None,
                  learning_rate: float = None,
@@ -68,7 +69,7 @@ class Composer:
                  num_layers: int = None,
                  momentum: float = None,
                  optimizer: str = None,
-                 nesterov: bool=False,
+                 nesterov: bool = False,
                  beta1: float = None,
                  beta2: float = None,
                  initializers=None,
@@ -130,8 +131,8 @@ class Composer:
                 self.manyInitializers = True
         else:
             self.manyInitializers = False
-        if len(activation_functions)-1 > 1:
-            if len(activation_functions) != num_layers+1:
+        if len(activation_functions) - 1 > 1:
+            if len(activation_functions) != num_layers + 1:
                 print(activation_functions, num_layers)
                 raise ValueError("Parameter activation_functions must have the same length as num_layers")
             else:
@@ -143,30 +144,28 @@ class Composer:
         # If one, every layer will have the same initializer
         # If more than one, each layer will have its own initializer and the # of initializers must be equal to # of layer
         self.initializers = [InitializersNames[initializer.lower()]() if isinstance(initializer, str) else initializer
-                            for initializer in initializers]
+                             for initializer in initializers]
 
         self.callbacks = [CallbacksNames[callback.lower()](run_name='test') if isinstance(callback, str) else callback
-                        for callback in callbacks]
+                          for callback in callbacks]
 
         self.loss_function = LossFunctionsNames[loss_function.lower()]() \
             if isinstance(loss_function, str) else loss_function
 
         self.activation_functions = [ActivationFunctionsNames[activation_function.lower()]()
-                                    if isinstance(activation_function, str) else activation_function
-                                    for activation_function in activation_functions]
-        
-        
-        self.optimizer = OptimizersNames[optimizer.lower()](regularization=regularization, 
-                                                            learning_rate=learning_rate, 
-                                                            momentum=momentum, 
-                                                            nesterov=nesterov, 
-                                                            beta1=beta1, 
-                                                            beta2=beta2, 
+                                     if isinstance(activation_function, str) else activation_function
+                                     for activation_function in activation_functions]
+
+        self.optimizer = OptimizersNames[optimizer.lower()](regularization=regularization,
+                                                            learning_rate=learning_rate,
+                                                            momentum=momentum,
+                                                            nesterov=nesterov,
+                                                            beta1=beta1,
+                                                            beta2=beta2,
                                                             eps=eps
                                                             ) \
-        if isinstance(optimizer, str) else optimizer
-                
-                
+            if isinstance(optimizer, str) else optimizer
+
         self.num_of_units = num_of_units
         self.input_shape = input_shape
         self.num_layers = num_layers
@@ -190,9 +189,9 @@ class Composer:
         layers.append(output_layer)
 
         model = NeuralNetwork.NeuralNetwork(optimizer=self.optimizer,
-                                             callbacks=self.callbacks,
-                                             metrics=['mse', 'mae', 'mee', 'binary_accuracy'],
-                                             layers=layers,
-                                             verbose=self.verbose)
+                                            callbacks=self.callbacks,
+                                            metrics=['mse', 'mae', 'mee', 'binary_accuracy'],
+                                            layers=layers,
+                                            verbose=self.verbose)
 
         return model

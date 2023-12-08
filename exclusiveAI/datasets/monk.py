@@ -21,6 +21,7 @@ def read_monk(index: int) -> tuple:
     ).set_index("id")
 
     train_label = np.array(train_set_df.pop("class"))
+    train_set_df = np.array(train_set_df)
 
     test_set_df = pd.read_csv(
         test_set_filepath,
@@ -29,6 +30,7 @@ def read_monk(index: int) -> tuple:
     ).set_index("id")
 
     test_label = np.array(test_set_df.pop("class"))
+    test_set_df = np.array(test_set_df)
 
     return train_set_df, train_label, test_set_df, test_label
 
