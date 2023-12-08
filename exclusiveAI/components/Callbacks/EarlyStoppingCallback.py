@@ -1,4 +1,5 @@
 __all__ = ['EarlyStoppingCallback']
+
 from ..NeuralNetwork import NeuralNetwork
 
 
@@ -6,7 +7,9 @@ class EarlyStoppingCallback:
     """
     Implements early stopping
     """
-    def __init__(self, eps:float=1e-8, patience_limit: int = 3, metric: str='val_mse', restore_weights:bool=False):
+
+    def __init__(self, eps: float = 1e-8, patience_limit: int = 3, metric: str = 'val_mse',
+                 restore_weights: bool = False):
         self.restore_weights = restore_weights
         self.patience_limit = patience_limit
         self.best_loss = float('inf')
@@ -18,7 +21,7 @@ class EarlyStoppingCallback:
         self.eps = eps
 
     def __call__(self, model: NeuralNetwork):
-        if self.metric=='val_mse':
+        if self.metric == 'val_mse':
             # check if val_mse in history
             if 'val_mse' not in model.history:
                 self.metric = 'mse'
@@ -53,6 +56,6 @@ class EarlyStoppingCallback:
         self.eps = 1e-8
         self.stop = False
         self.metric = 'val_mse'
-        
+
     def close(self):
         self.reset()
