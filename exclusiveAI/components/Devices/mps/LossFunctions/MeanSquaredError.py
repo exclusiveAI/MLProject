@@ -11,6 +11,14 @@ class MeanSquaredError(LossFunction):
     def __init__(self):
         super().__init__(
             name="Mean Squared Error",
-            function=lambda y_true, y_pred: mps.mean(mps.sum(mps.square(y_true-y_pred), axis=1)),
-            derivative=lambda y_true, y_pred: -(2 / y_true.shape[0]) * (y_true - y_pred)
+            function=self.function,
+            derivative=self.derivative
         )
+
+    @staticmethod
+    def function(y_true, y_pred):
+        return mps.mean(mps.sum(mps.square(y_true-y_pred), axis=1))
+
+    @staticmethod
+    def derivative(y_true, y_pred):
+        return -(2 / y_true.shape[0]) * (y_true - y_pred)

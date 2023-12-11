@@ -8,10 +8,18 @@ class Sigmoid(ActivationFunction):
     """
     Sigmoid activation function.
     """
+
     def __init__(self):
-        sigmoid = lambda x: mps.ones(x.shape) / (mps.ones(x.shape) + mps.exp(-x))
         super().__init__(
             name="Sigmoid",
-            function= sigmoid,
-            derivative=lambda x: sigmoid(x) * (mps.ones(x.shape) - sigmoid(x))
+            function=self.function,
+            derivative=self.derivative
         )
+
+    @staticmethod
+    def function(x):
+        return mps.ones(x.shape) / (mps.ones(x.shape) + mps.exp(-x))
+
+    @staticmethod
+    def derivative(x):
+        return Sigmoid.function(x) * (mps.ones(x.shape) - Sigmoid.function(x))

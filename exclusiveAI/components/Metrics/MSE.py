@@ -9,5 +9,8 @@ class MSE(Metric):
     Mean squared error (MSE)
     """
     def __init__(self):
-        f = lambda y_pred, y_true: np.mean(np.sum(np.square(y_pred - y_true), axis=1))
-        super().__init__(name='mse', f=f)
+        super().__init__(name='mse', f=self.function)
+
+    @staticmethod
+    def function(y_pred, y_true):
+        return np.mean(np.sum(np.square(y_pred - y_true), axis=1))

@@ -11,5 +11,8 @@ class MAE(Metric):
     """
 
     def __init__(self):
-        f = lambda y_pred, y_true: mps.mean(mps.abs(y_true - y_pred))
-        super().__init__(name='mae', f=f)
+        super().__init__(name='mae', f=self.function)
+
+    @staticmethod
+    def function(y_true, y_pred):
+        return mps.mean(mps.abs(y_true - y_pred))
