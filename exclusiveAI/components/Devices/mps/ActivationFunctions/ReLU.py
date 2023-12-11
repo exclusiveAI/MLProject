@@ -11,7 +11,14 @@ class ReLU(ActivationFunction):
     def __init__(self) -> None:
         super().__init__(
             name="ReLU",
-            function=lambda x: mps.maximum(x, mps.zeros(shape=x.shape)),
-            derivative=lambda x: mps.where(x < 0, mps.zeros(shape=x.shape), mps.ones(shape=x.shape)),
+            function=self.function,
+            derivative=self.derivative,
         )
 
+    @staticmethod
+    def function(x):
+        return mps.maximum(x, mps.zeros(shape=x.shape))
+
+    @staticmethod
+    def derivative(x):
+        return mps.where(x < 0, mps.zeros(shape=x.shape), mps.ones(shape=x.shape))

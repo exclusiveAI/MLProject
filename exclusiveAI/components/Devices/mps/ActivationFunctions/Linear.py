@@ -11,6 +11,14 @@ class Linear(ActivationFunction):
     def __init__(self):
         super().__init__(
             name="Linear",
-            function=lambda x: x,
-            derivative=lambda x: mps.ones(shape=x.shape),
+            function=self.function,
+            derivative=self.derivative,
         )
+
+    @staticmethod
+    def function(x):
+        return x
+
+    @staticmethod
+    def derivative(x):
+        return mps.ones(shape=x.shape)

@@ -10,5 +10,8 @@ class MSE(Metric):
     Mean squared error (MSE)
     """
     def __init__(self):
-        f = lambda y_pred, y_true: mps.mean(mps.sum(mps.square(y_pred - y_true), axis=1))
-        super().__init__(name='mse', f=f)
+        super().__init__(name='mse', f=self.function)
+
+    @staticmethod
+    def function(y_true, y_pred):
+        return mps.mean(mps.sum(mps.square(y_pred - y_true), axis=1))

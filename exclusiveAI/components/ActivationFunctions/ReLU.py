@@ -11,7 +11,14 @@ class ReLU(ActivationFunction):
     def __init__(self) -> None:
         super().__init__(
             name="ReLU",
-            function=lambda x: np.maximum(x, np.zeros(shape=x.shape)),
-            derivative=lambda x: np.where(x < 0, np.zeros(shape=x.shape), np.ones(shape=x.shape)),
+            function=self.function,
+            derivative=self.derivative,
         )
 
+    @staticmethod
+    def function(x):
+        return np.maximum(x, np.zeros(shape=x.shape))
+
+    @staticmethod
+    def derivative(x):
+        return np.where(x < 0, np.zeros(shape=x.shape), np.ones(shape=x.shape))

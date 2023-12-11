@@ -9,9 +9,16 @@ class Tanh(ActivationFunction):
     Tanh activation function.
     """
     def __init__(self):
-        tanh = lambda x: (mps.exp(x) - mps.exp(-x)) / (mps.exp(x) + mps.exp(-x))
         super().__init__(
             name="Tanh",
-            function=tanh,
-            derivative=lambda x: mps.ones(shape=x.shape) - mps.square(tanh(x)),
+            function=self.function,
+            derivative=self.derivative,
         )
+
+    @staticmethod
+    def function(x):
+        return (mps.exp(x) - mps.exp(-x)) / (mps.exp(x) + mps.exp(-x))
+
+    @staticmethod
+    def derivative(x):
+        return mps.ones(shape=x.shape) - mps.square(Tanh.function(x))
