@@ -61,16 +61,16 @@ test = one_hot_encoding(test)
 
 # ea = EarlyStoppingCallback(patience_limit=50, restore_weights=False)
 values = list(np.arange(0.01, 0.5, 0.01))
-values2 = [0]
+values2 = [0, 0.1]
 
 uniform = Uniform(low=-1, high=1)
 
 myConfigurator = ConfiguratorGen(random=False, learning_rates=values,
                                  loss_function=['mse'], optimizer=['sgd'],
                                  activation_functions=['sigmoid'],
-                                 number_of_units=[1, 2, 3, 4], number_of_layers=[1],
+                                 number_of_units=[1, 2, 3, 4], number_of_layers=[1, 2],
                                  momentums=[0.96, 0.97, 0.99], initializers=[uniform], input_shapes=train.shape,
-                                 verbose=False, nesterov=True, number_of_initializations=2,
+                                 verbose=False, nesterov=True,
                                  callbacks=["earlystopping"], output_activation='sigmoid'
                                  )
 
