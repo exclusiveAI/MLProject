@@ -1,6 +1,6 @@
 __all__ = ["Softmax"]
 
-import numpy as np
+import mlx.core as mps
 from .ActivationFunction import ActivationFunction
 
 
@@ -17,8 +17,8 @@ class Softmax(ActivationFunction):
 
     @staticmethod
     def function(x):
-        return np.exp(x) / np.sum(np.exp(x), axis=0)
+        return mps.exp(x) / mps.sum(mps.exp(x), axis=0)
 
     @staticmethod
     def derivative(x):
-        return np.exp(x - x.max()) / np.sum(np.exp(x - x.max()), axis=0)
+        return mps.exp(x - x.max()) / mps.sum(mps.exp(x - x.max()), axis=0)

@@ -1,5 +1,4 @@
 import numpy as np
-from exclusiveAI.components.LossFunctions import LossFunction
 from exclusiveAI.components.Optimizers import Optimizer
 from exclusiveAI.components.Metrics import MetricUtils
 from exclusiveAI import utils
@@ -18,7 +17,7 @@ class NeuralNetwork:
         metrics (list): A list of metrics to be used during training.
         verbose (bool): Whether to print out the progress of the model.
         shuffle (bool): Whether to shuffle the data before training.
-    Attrubutes:
+    Attributes:
 
         optimizer (Optimizer): The optimizer to be used for training.
         callbacks (list): A list of callbacks to be used during training.
@@ -30,6 +29,7 @@ class NeuralNetwork:
         metrics (list): A list of metrics to be used during training.
         history (dict): A dictionary containing the training history metrics.
     """
+
     def __init__(self,
                  layers: list,
                  optimizer: Optimizer,
@@ -64,7 +64,7 @@ class NeuralNetwork:
               input_label: np.array,
               val: np.array = None,
               val_labels: np.array = None,
-              epochs=100, batch_size=32, name:str='', thread: int=0):
+              epochs=100, batch_size=32, name: str = '', disable_line=False):
         """
         Perform the model training on input data and label.
 
@@ -75,7 +75,8 @@ class NeuralNetwork:
             val_labels (no.array): the validation data label
             epochs (int): the number of epochs
             batch_size (int): the size of a batch used in minibatch approach
-            thread (int): number of thread to be used
+            disable_line (bool): show line
+            name: name of the model
 
         Returns: training history
 
@@ -88,7 +89,7 @@ class NeuralNetwork:
         MetricUtils.initialize_history(self, val is not None)
         for callback in self.callbacks:
             callback.reset()
-        with tqdm(total=epochs, position=thread, desc="Epochs", colour="white") as pbar:
+        with tqdm(total=epochs, desc="Epochs", colour="white", disable=disable_line) as pbar:
             for epoch in range(epochs):
                 output = self.predict(inputs)
 
@@ -154,7 +155,8 @@ class NeuralNetwork:
         Returns: metrics on prediction
         """
         output = self.predict(input)
-        return MetricUtils.calculate('mse', target=input_label, predicted=output),  MetricUtils.calculate('binary_accuracy', target=input_label, predicted=output)
+        return MetricUtils.calculate('mse', target=input_label, predicted=output), MetricUtils.calculate(
+            'binary_accuracy', target=input_label, predicted=output)
 
     def get_weights(self):
         weights = []

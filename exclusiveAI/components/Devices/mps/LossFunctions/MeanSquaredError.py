@@ -1,4 +1,4 @@
-import numpy as np
+import mlx.core as mps
 from .LossFunction import LossFunction
 
 __all__ = ["MeanSquaredError"]
@@ -17,7 +17,7 @@ class MeanSquaredError(LossFunction):
 
     @staticmethod
     def function(y_true, y_pred):
-        return np.mean(np.sum(np.square(y_true-y_pred), axis=1))
+        return mps.mean(mps.sum(mps.square(y_true-y_pred), axis=1))
 
     @staticmethod
     def derivative(y_true, y_pred):

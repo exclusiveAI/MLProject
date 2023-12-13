@@ -1,5 +1,6 @@
 from .Metric import Metric
-import numpy as np
+import mlx.core as mps
+
 
 __all__ = ['MAE']
 
@@ -14,4 +15,4 @@ class MAE(Metric):
 
     @staticmethod
     def function(y_true, y_pred):
-        return np.mean(np.abs(y_true - y_pred), dtype='float32')
+        return mps.mean(mps.abs(y_true - y_pred))

@@ -1,4 +1,4 @@
-import numpy as np
+import mlx.core as mps
 from .ActivationFunction import ActivationFunction
 
 __all__ = ["ReLU"]
@@ -17,8 +17,8 @@ class ReLU(ActivationFunction):
 
     @staticmethod
     def function(x):
-        return np.maximum(x, np.zeros(shape=x.shape))
+        return mps.maximum(x, mps.zeros(shape=x.shape))
 
     @staticmethod
     def derivative(x):
-        return np.where(x < 0, np.zeros(shape=x.shape), np.ones(shape=x.shape))
+        return mps.where(x < 0, mps.zeros(shape=x.shape), mps.ones(shape=x.shape))

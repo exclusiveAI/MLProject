@@ -65,11 +65,13 @@ class Composer:
                  learning_rate: float = None,
                  loss_function: str = None,
                  activation_functions=None,
+                 output_activation=None,
                  num_of_units: list = None,
+                 model_name: str = 'test',
                  num_layers: int = None,
+                 nesterov: bool = False,
                  momentum: float = None,
                  optimizer: str = None,
-                 nesterov: bool = False,
                  beta1: float = None,
                  beta2: float = None,
                  initializers=None,
@@ -82,21 +84,21 @@ class Composer:
                  ):
         if config is not None:
             regularization = config.get('regularization', regularization)
-            beta1 = config.get('beta1', beta1)
-            beta2 = config.get('beta2', beta2)
-            eps = config.get('eps', eps)
             learning_rate = config.get('learning_rate', learning_rate)
             loss_function = config.get('loss_function', loss_function)
             activation_functions = config.get('activation_functions', activation_functions)
+            output_activation = config.get('output_activation', output_activation)
             num_of_units = config.get('num_of_units', num_of_units)
             num_layers = config.get('num_layers', num_layers)
             momentum = config.get('momentum', momentum)
             optimizer = config.get('optimizer', optimizer)
             initializers = config.get('initializers', initializers)
             callbacks = config.get('callbacks', callbacks)
+            nesterov = config.get('nesterov', nesterov)
             verbose = config.get('verbose', verbose)
             outputs = config.get('outputs', outputs)
             input_shape = config.get('input_shape', input_shape)
+            model_name = config.get('model_name', model_name)
         if input_shape is None:
             # Error can't initialize
             raise ValueError("Parameter input_shape can't be None")
@@ -115,15 +117,15 @@ class Composer:
         if loss_function is None:
             loss_function = MeanSquaredError()
         if activation_functions is None:
-            activation_functions = [Sigmoid(), Linear()]
+            activation_functions = [Sigmoid()]
+        if output_activation is None:
+            output_activation = Sigmoid()
         if not isinstance(activation_functions, list):
             activation_functions = [activation_functions]
         if not isinstance(initializers, list):
             initializers = [initializers]
         if not isinstance(callbacks, list):
             callbacks = [callbacks]
-        if len(activation_functions) == 1:
-            activation_functions.insert(0, Sigmoid())
         if len(initializers) > 1:
             if len(initializers) != num_layers:
                 raise ValueError("Parameter initializers must have the same length as num_layers")
@@ -133,7 +135,7 @@ class Composer:
             self.manyInitializers = False
         if len(activation_functions) - 1 > 1:
             if len(activation_functions) != num_layers + 1:
-                print(activation_functions, num_layers)
+                print(activation_functions, num_layers, config)
                 raise ValueError("Parameter activation_functions must have the same length as num_layers")
             else:
                 self.manyActivations = True
@@ -146,7 +148,7 @@ class Composer:
         self.initializers = [InitializersNames[initializer.lower()]() if isinstance(initializer, str) else initializer
                              for initializer in initializers]
 
-        self.callbacks = [CallbacksNames[callback.lower()](run_name='test') if isinstance(callback, str) else callback
+        self.callbacks = [CallbacksNames[callback.lower()](run_name=model_name) if isinstance(callback, str) else callback
                           for callback in callbacks]
 
         self.loss_function = LossFunctionsNames[loss_function.lower()]() \
@@ -155,6 +157,8 @@ class Composer:
         self.activation_functions = [ActivationFunctionsNames[activation_function.lower()]()
                                      if isinstance(activation_function, str) else activation_function
                                      for activation_function in activation_functions]
+
+        self.output_activation = ActivationFunctionsNames[output_activation.lower()]() if isinstance(output_activation, str) else output_activation
 
         self.optimizer = OptimizersNames[optimizer.lower()](regularization=regularization,
                                                             learning_rate=learning_rate,
@@ -172,7 +176,7 @@ class Composer:
         self.output_units = outputs
         self.verbose = verbose
 
-    def compose(self):
+    def compose(self, regression: bool = False):
         """
         Compose the building block to build the model.
         Returns:
@@ -184,13 +188,13 @@ class Composer:
         for i in range(self.num_layers):
             layers.append(Layer(self.num_of_units[i], self.initializers[i if self.manyInitializers else 0],
                                 self.activation_functions[i if self.manyActivations else 0]))
-        output_layer = OutputLayer(units=self.output_units, activation_function=self.activation_functions[-1],
+        output_layer = OutputLayer(units=self.output_units, activation_function=self.output_activation,
                                    initializer=self.initializers[-1], loss_function=self.loss_function)
         layers.append(output_layer)
 
         model = NeuralNetwork.NeuralNetwork(optimizer=self.optimizer,
                                             callbacks=self.callbacks,
-                                            metrics=['mse', 'mae', 'mee', 'binary_accuracy'],
+                                            metrics=['mse', 'mae', 'mee', 'binary_accuracy'] if not regression else ['mse', 'mae', 'mee'],
                                             layers=layers,
                                             verbose=self.verbose)
 

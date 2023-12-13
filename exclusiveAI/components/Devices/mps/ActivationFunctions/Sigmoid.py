@@ -1,4 +1,4 @@
-import numpy as np
+import mlx.core as mps
 from .ActivationFunction import ActivationFunction
 
 __all__ = ["Sigmoid"]
@@ -18,8 +18,8 @@ class Sigmoid(ActivationFunction):
 
     @staticmethod
     def function(x):
-        return np.ones(x.shape) / (np.ones(x.shape) + np.exp(-x))
+        return mps.ones(x.shape) / (mps.ones(x.shape) + mps.exp(-x))
 
     @staticmethod
     def derivative(x):
-        return Sigmoid.function(x) * (np.ones(x.shape) - Sigmoid.function(x))
+        return Sigmoid.function(x) * (mps.ones(x.shape) - Sigmoid.function(x))

@@ -1,4 +1,4 @@
-import numpy as np
+import mlx.core as mps
 from .LossFunction import LossFunction
 
 __all__ = ["MeanEuclideanDistance"]
@@ -17,8 +17,8 @@ class MeanEuclideanDistance(LossFunction):
 
     @staticmethod
     def function(y_true, y_pred):
-        return np.mean(np.sqrt(np.sum((np.square(y_true-y_pred)), axis=1)))
+        return mps.mean(mps.sqrt(mps.sum(mps.square(y_true-y_pred), axis=1)))
 
     @staticmethod
     def derivative(y_true, y_pred):
-        return -1 / y_pred.shape[0] * (y_true-y_pred) / np.linalg.norm(y_true - y_pred, axis=1).reshape(-1, 1)
+        return -1 / y_pred.shape[0] * (y_true-y_pred) / mps.sqrt(mps.sum((mps.square(y_true-y_pred)), axis=1)).reshape(-1, 1)

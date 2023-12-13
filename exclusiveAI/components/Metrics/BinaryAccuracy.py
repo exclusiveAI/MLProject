@@ -1,11 +1,16 @@
 from .Metric import Metric
 import numpy as np
 
+
 class BinaryAccuracy(Metric):
+    """
+		Binary Accuracy
 	"""
-	Binary Accuracy
-	"""
-	def __init__(self):
-		name = "binary_accuracy"
-		f = lambda y_true, y_pred: np.average((np.round(np.abs(y_true)) == np.round(np.abs(y_pred))))
-		super().__init__(name, f=f)
+
+    def __init__(self):
+        super().__init__(name="binary_accuracy",
+                         f=self.function)
+
+    @staticmethod
+    def function(y_true, y_pred):
+        return np.average((np.round(np.abs(y_true)) == np.round(np.abs(y_pred))))
