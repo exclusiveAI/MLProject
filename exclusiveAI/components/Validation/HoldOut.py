@@ -54,7 +54,7 @@ class HoldOut:
                                                                                random_state=self.seed)
         return train, train_target, validation, validation_target
 
-    def hold_out(self, metric: str = None, all_models: bool = False, epochs=100, batch_size=32):
+    def hold_out(self, metric: str = None, all_models: bool = False, epochs=100, batch_size=32, disable_line=True):
         """
         The hold out algorithm
         Args:
@@ -69,7 +69,7 @@ class HoldOut:
         with tqdm(total=self.models.len(), desc="Models", colour="white") as pbar:
             for model, config in self.models:
                 model.train(train, train_target, None if self.assessment else validation,
-                            None if self.assessment else validation_target, disable_line=True, epochs=epochs,
+                            None if self.assessment else validation_target, disable_line=disable_line, epochs=epochs,
                             batch_size=batch_size)
                 if not self.best_models:
                     self.best_models.append(model)

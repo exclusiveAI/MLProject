@@ -9,9 +9,9 @@ __all__ = [
 ]
 
 
-def read_monk(index: int) -> tuple:
-    train_set_filepath = f"../exclusiveAI/datasets/monks-{index}.train"
-    test_set_filepath = f"../exclusiveAI/datasets/monks-{index}.test"
+def read_monk(index: int, path="exclusiveAI/datasets/") -> tuple:
+    train_set_filepath = f"{path}monks-{index}.train"
+    test_set_filepath = f"{path}monks-{index}.test"
 
     # reading csvs
     train_set_df = pd.read_csv(
@@ -35,13 +35,13 @@ def read_monk(index: int) -> tuple:
     return train_set_df, train_label, test_set_df, test_label
 
 
-def read_monk1() -> tuple:
-    return read_monk(1)
+def read_monk1(path="exclusiveAI/datasets/") -> tuple:
+    return read_monk(1, path=path)
 
 
-def read_monk2() -> tuple:
-    return read_monk(2)
+def read_monk2(path="exclusiveAI/datasets/") -> tuple:
+    return read_monk(2, path=path)
 
 
-def read_monk3() -> tuple:
-    return read_monk(3)
+def read_monk3(path="exclusiveAI/datasets/") -> tuple:
+    return read_monk(3, path=path)

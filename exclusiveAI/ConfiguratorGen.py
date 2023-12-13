@@ -2,6 +2,7 @@ from exclusiveAI.Composer import Composer
 from itertools import product
 from tqdm import tqdm
 import numpy as np
+import pickle
 
 
 class ConfiguratorGen:
@@ -57,7 +58,7 @@ class ConfiguratorGen:
         if momentums is None:
             momentums = [0]
         self.output_activation = output_activation \
-            if isinstance(output_activation, list) else [output_activation]
+            if isinstance(output_activation, list) else output_activation
         self.loss_function = loss_function \
             if isinstance(loss_function, list) else [loss_function]
         self.optimizer = optimizer \
@@ -65,7 +66,7 @@ class ConfiguratorGen:
 
         self.activation_functions = activation_functions
         self.number_of_layers = number_of_layers
-        self.number_of_units = number_of_units if isinstance(number_of_units[0], list) else [number_of_units]
+        self.number_of_units = number_of_units
         self.regularizations = regularizations
         self.learning_rates = learning_rates
         self.initializers = initializers
@@ -77,6 +78,7 @@ class ConfiguratorGen:
 
         self.type = 'random' if random else 'grid'
         self.num_of_configurations = max_configs
+
         configurations = product(regularizations,
                                  learning_rates,
                                  loss_function,
@@ -88,14 +90,7 @@ class ConfiguratorGen:
                                  )
 
         selected_configs = list(configurations)
-        with tqdm(total=len(selected_configs)*number_of_initializations, desc="1st for", colour="white") as pbar:
-            tmp_configurations = []
-            for config in selected_configs:
-                for i in range(number_of_initializations):
-                    tmp_configurations.append(config)
-                    pbar.update(1)
 
-            selected_configs = tmp_configurations
         with tqdm(total=len(selected_configs) * number_of_initializations, desc="2nd for", colour="white") as pbar:
             final_configs = []
             for config in selected_configs:
@@ -108,6 +103,16 @@ class ConfiguratorGen:
                         local_config = internal_config[:6] + [unit, activation] + internal_config[6:]
                         final_configs.append(local_config)
                 pbar.update(1)
+
+        if number_of_initializations > 1:
+            with tqdm(total=len(final_configs) * number_of_initializations, desc="1st for", colour="white") as pbar:
+                tmp_configurations = []
+                for config in final_configs:
+                    for i in range(number_of_initializations):
+                        tmp_configurations.append(config)
+                        pbar.update(1)
+
+                final_configs = tmp_configurations
 
         if self.type == 'random':
             indices = np.random.permutation(len(final_configs))
@@ -126,7 +131,7 @@ class ConfiguratorGen:
             print(f"Current configuration: {self.current} of {self.max}")
         config = self.configs[self.current]
         config = {"regularization": config[0], "learning_rate": config[1], "loss_function": config[2],
-                  "activation_functions": list(config[7]),
+                  "activation_functions": list(config[7]), "output_activation": self.output_activation,
                   "num_of_units": list(config[6]), "num_layers": config[5], "momentum": config[3],
                   "optimizer": config[4],
                   "initializers": config[8], "nesterov": True if config[9] == 'True' else False,
@@ -150,29 +155,24 @@ class ConfiguratorGen:
     def len(self):
         return self.max
 
+    def save(self, filename="configs.pkl"):
+        """
+        Save self.configs as a pickle file.
+
+        Args:
+            filename (str, optional): The name of the pickle file. Defaults to "configs.pkl".
+        """
+        with open(filename, 'wb') as file:
+            pickle.dump(self, file)
+
     @staticmethod
     def units_per_layer_combinations(units, layers):
         tmp_units = units
-        if len(tmp_units) > 1 and len(tmp_units) != layers:
-            if not isinstance(tmp_units[0], list):
-                tmp_units = [tmp_units]
-        if len(tmp_units) == layers:
-            result = [list(x) for x in product(*tmp_units)]
-        elif len(tmp_units) == 1:
-            result = [list(x) for x in product(*tmp_units, repeat=layers)]
-        else:
-            raise ValueError(f"{len(tmp_units)} and {layers}")
+        result = [list(x) for x in product(tmp_units, repeat=layers)]
         return result
 
-    def activation_per_layer(self, activation_functions, layers):
+    @staticmethod
+    def activation_per_layer(activation_functions, layers):
         tmp_activations = activation_functions
-        if len(tmp_activations) == layers:
-            result = tmp_activations
-            result.append(self.output_activation[0])
-            return [result]
-        else:
-            result = [list(x) for x in list(product(tmp_activations, repeat=layers))]
-            for res in result:
-                res.append(self.output_activation[0])
-
+        result = [list(x) for x in list(product(tmp_activations, repeat=layers))]
         return result
