@@ -1,24 +1,24 @@
-import numpy as np
+import mlx.core as mps
 from .ActivationFunction import ActivationFunction
 
-__all__ = ["Linear"]
+__all__ = ["Tanh"]
 
 
-class Linear(ActivationFunction):
+class Tanh(ActivationFunction):
     """
-    Linear activation function.
+    Tanh activation function.
     """
     def __init__(self):
         super().__init__(
-            name="Linear",
+            name="Tanh",
             function=self.function,
             derivative=self.derivative,
         )
 
     @staticmethod
     def function(x):
-        return x
+        return (mps.exp(x) - mps.exp(-x)) / (mps.exp(x) + mps.exp(-x))
 
     @staticmethod
     def derivative(x):
-        return np.ones(shape=x.shape)
+        return mps.ones(shape=x.shape) - mps.square(Tanh.function(x))

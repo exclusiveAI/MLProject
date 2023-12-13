@@ -1,4 +1,4 @@
-import numpy as np
+import mlx.core as mps
 from .ActivationFunction import ActivationFunction
 
 __all__ = ["Linear"]
@@ -21,4 +21,4 @@ class Linear(ActivationFunction):
 
     @staticmethod
     def derivative(x):
-        return np.ones(shape=x.shape)
+        return mps.ones(shape=x.shape)
