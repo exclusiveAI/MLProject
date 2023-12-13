@@ -66,10 +66,11 @@ class Composer:
                  loss_function: str = None,
                  activation_functions=None,
                  num_of_units: list = None,
+                 model_name: str = 'test',
                  num_layers: int = None,
+                 nesterov: bool = False,
                  momentum: float = None,
                  optimizer: str = None,
-                 nesterov: bool = False,
                  beta1: float = None,
                  beta2: float = None,
                  initializers=None,
@@ -82,9 +83,6 @@ class Composer:
                  ):
         if config is not None:
             regularization = config.get('regularization', regularization)
-            beta1 = config.get('beta1', beta1)
-            beta2 = config.get('beta2', beta2)
-            eps = config.get('eps', eps)
             learning_rate = config.get('learning_rate', learning_rate)
             loss_function = config.get('loss_function', loss_function)
             activation_functions = config.get('activation_functions', activation_functions)
@@ -94,9 +92,11 @@ class Composer:
             optimizer = config.get('optimizer', optimizer)
             initializers = config.get('initializers', initializers)
             callbacks = config.get('callbacks', callbacks)
+            nesterov = config.get('nesterov', nesterov)
             verbose = config.get('verbose', verbose)
             outputs = config.get('outputs', outputs)
             input_shape = config.get('input_shape', input_shape)
+            model_name = config.get('model_name', model_name)
         if input_shape is None:
             # Error can't initialize
             raise ValueError("Parameter input_shape can't be None")
@@ -146,7 +146,7 @@ class Composer:
         self.initializers = [InitializersNames[initializer.lower()]() if isinstance(initializer, str) else initializer
                              for initializer in initializers]
 
-        self.callbacks = [CallbacksNames[callback.lower()](run_name='test') if isinstance(callback, str) else callback
+        self.callbacks = [CallbacksNames[callback.lower()](run_name=model_name) if isinstance(callback, str) else callback
                           for callback in callbacks]
 
         self.loss_function = LossFunctionsNames[loss_function.lower()]() \
@@ -172,7 +172,7 @@ class Composer:
         self.output_units = outputs
         self.verbose = verbose
 
-    def compose(self):
+    def compose(self, regression: bool = False):
         """
         Compose the building block to build the model.
         Returns:
@@ -190,7 +190,7 @@ class Composer:
 
         model = NeuralNetwork.NeuralNetwork(optimizer=self.optimizer,
                                             callbacks=self.callbacks,
-                                            metrics=['mse', 'mae', 'mee', 'binary_accuracy'],
+                                            metrics=['mse', 'mae', 'mee', 'binary_accuracy'] if not regression else ['mse', 'mae', 'mee'],
                                             layers=layers,
                                             verbose=self.verbose)
 

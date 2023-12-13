@@ -10,8 +10,8 @@ __all__ = [
 
 
 def read_monk(index: int) -> tuple:
-    train_set_filepath = f"exclusiveAI/datasets/monks-{index}.train"
-    test_set_filepath = f"exclusiveAI/datasets/monks-{index}.test"
+    train_set_filepath = f"../exclusiveAI/datasets/monks-{index}.train"
+    test_set_filepath = f"../exclusiveAI/datasets/monks-{index}.test"
 
     # reading csvs
     train_set_df = pd.read_csv(

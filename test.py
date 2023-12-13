@@ -1,9 +1,8 @@
 from exclusiveAI.ConfiguratorGen import ConfiguratorGen
 from exclusiveAI.Composer import Composer
 from exclusiveAI.components.Validation import *
-from exclusiveAI.components.CallBacks import *
 from exclusiveAI.datasets.monk import read_monk1
-from exclusiveAI.utils import confusion_matrix, one_hot_encoding
+from exclusiveAI.utils import one_hot_encoding, plot_history
 from exclusiveAI.components.Initializers import *
 # from exclusiveAI.components import *
 # from exclusiveAI import neural_network
@@ -60,30 +59,30 @@ train, train_label, test, test_label = read_monk1()
 train = one_hot_encoding(train)
 test = one_hot_encoding(test)
 
-ea = EarlyStoppingCallback(patience_limit=50)
-values = np.arange(0.1, 0.4, 0.01)
+# ea = EarlyStoppingCallback(patience_limit=50, restore_weights=False)
+values = list(np.arange(0.01, 0.5, 0.01))
 values2 = [0]
 
 uniform = Uniform(low=-1, high=1)
 
-myconfigurator = ConfiguratorGen(random=False, regularizations=values2, learning_rates=values,
-                                 loss_functions=['mse'], optimizer=['sgd'],
+myConfigurator = ConfiguratorGen(random=False, learning_rates=values,
+                                 loss_function=['mse'], optimizer=['sgd'],
                                  activation_functions=['sigmoid'],
-                                 number_of_units=[2, 3, 4], number_of_layers=[1],
-                                 momentums=[0.95, 0.96], initializers=[uniform], input_shapes=train.shape, verbose=False,
-                                 callbacks=[ea], output_activation='sigmoid'
+                                 number_of_units=[1, 2, 3, 4], number_of_layers=[1],
+                                 momentums=[0.96, 0.97, 0.99], initializers=[uniform], input_shapes=train.shape,
+                                 verbose=False, nesterov=True, number_of_initializations=2,
+                                 callbacks=["earlystopping"], output_activation='sigmoid'
                                  )
 
-myval = HoldOut(models=myconfigurator, input=train, target=train_label, debug=True)
-config = myval.hold_out()
+myVal = HoldOut(models=myConfigurator, input=train, target=train_label)
+config = myVal.hold_out(epochs=250, batch_size=128)
 
-ea = EarlyStoppingCallback(patience_limit=50)
-config['callbacks'] = [ea, 'wandb']
 model = Composer(config=config).compose()
 
 print("Model found:", config)
-model.train(train, train_label, test, test_label, epochs=100)
-
+model.train(train, train_label, epochs=500, batch_size=128)
+history_mse = model.history['mee']
+plot_history(lines={'mee': history_mse})
 res = model.evaluate(input=test, input_label=test_label)
 
 print(res)

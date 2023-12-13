@@ -8,8 +8,8 @@ class EarlyStoppingCallback:
     Implements early stopping
     """
 
-    def __init__(self, eps: float = 1e-8, patience_limit: int = 3, metric: str = 'val_mse',
-                 restore_weights: bool = False):
+    def __init__(self, eps: float = 1e-3, patience_limit: int = 10, metric: str = 'val_mse',
+                 restore_weights: bool = False, **kwargs):
         self.restore_weights = restore_weights
         self.patience_limit = patience_limit
         self.best_loss = float('inf')
@@ -49,11 +49,9 @@ class EarlyStoppingCallback:
 
     def reset(self):
         self.best_loss = float('inf')
-        self.restore_weights = False
         self.best_weights = None
         self.best_epoch = 0
         self.patience = 0
-        self.eps = 1e-8
         self.stop = False
         self.metric = 'val_mse'
 

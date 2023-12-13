@@ -1,4 +1,4 @@
-__all__ = ['utils', 'train_split', 'confusion_matrix', 'one_hot_encoding']
+__all__ = ['utils', 'train_split', 'confusion_matrix', 'one_hot_encoding', 'plot_history']
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -62,6 +62,13 @@ def confusion_matrix(predicted, target):
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
     plt.savefig('res.png')
+
+
+def plot_history(lines: dict):
+    for elem in lines:
+        plt.plot(lines[elem], label=elem)
+    plt.legend()
+    plt.show()
 
 
 def one_hot_encoding(y):
