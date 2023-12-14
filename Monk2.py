@@ -23,11 +23,11 @@ myConfigurator = ConfiguratorGen(random=False, learning_rates=learning_rates, re
                                  momentums=momentums, initializers=initializers,
                                  input_shapes=training_data.shape,
                                  verbose=False, nesterov=True, number_of_initializations=1,
-                                 callbacks=["earlystopping"], output_activation='sigmoid', show_line=True,
+                                 callbacks=["earlystopping"], output_activation='sigmoid', show_line=False,
                                  ).get_configs()
 
 length = len(myConfigurator)
-buckets = 10
+buckets = 100
 
 bucket = {}
 for i in range(buckets):
@@ -40,8 +40,8 @@ if __name__ == '__main__':
     for i in range(buckets):
         configs.append(
             parallel_hold_out(bucket[i], training=training_data, training_target=training_labels, epochs=epochs,
-                              batch_size=batch_size, all_models=True, num_models=500 // buckets))
+                              batch_size=batch_size, all_models=True, num_models=500 // buckets, workers=4))
 
-configs = pd.DataFrame(configs)
-# Save as json
-configs.to_json('monk2_models_configurations.json')
+    configs = pd.DataFrame(configs)
+    # Save as json
+    configs.to_json('monk2_models_configurations.json')
