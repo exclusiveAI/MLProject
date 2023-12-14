@@ -1,11 +1,11 @@
 from exclusiveAI.ConfiguratorGen import ConfiguratorGen
-from exclusiveAI.datasets.monk import read_monk1
+from exclusiveAI.datasets.monk import read_monk2
 from exclusiveAI.utils import one_hot_encoding
 from exclusiveAI.components.Validation.HoldOut import parallel_hold_out, hold_out
 import pandas as pd
 import numpy as np
 
-training_data, training_labels, test_data, test_labels = read_monk1("exclusiveAI/datasets/")
+training_data, training_labels, test_data, test_labels = read_monk2("exclusiveAI/datasets/")
 training_data = one_hot_encoding(training_data)
 test_data = one_hot_encoding(test_data)
 regularizations = np.arange(0, 0.001, 0.0001)
@@ -44,4 +44,4 @@ if __name__ == '__main__':
 
 configs = pd.DataFrame(configs)
 # Save as json
-configs.to_json('monk1_models_configurations.json')
+configs.to_json('monk2_models_configurations.json')
