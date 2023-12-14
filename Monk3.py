@@ -8,12 +8,13 @@ import numpy as np
 training_data, training_labels, test_data, test_labels = read_monk3("exclusiveAI/datasets/")
 training_data = one_hot_encoding(training_data)
 test_data = one_hot_encoding(test_data)
-regularizations = np.arange(0, 0.001, 0.0001)
-learning_rates = np.arange(0.01, 0.5, 0.01)
-number_of_units = range(1, 4, 1)
-number_of_layers = range(1, 2, 1)
+regularizations = np.arange(0, 0.11, 0.1).tolist()
+learning_rates = np.arange(0.1, 0.9, 0.01).tolist()
+number_of_units = list(range(1, 5, 1))
+number_of_layers = list(range(1, 3, 1))
 initializers = ["uniform", "gaussian"]
-momentums = np.arange(0, 0.999, 0.001)
+momentums = np.arange(0.5, 0.99, 0.01).tolist()
+momentums.insert(0, 0)
 activations = ["sigmoid"]
 
 myConfigurator = ConfiguratorGen(random=False, learning_rates=learning_rates, regularizations=regularizations,
@@ -23,11 +24,11 @@ myConfigurator = ConfiguratorGen(random=False, learning_rates=learning_rates, re
                                  momentums=momentums, initializers=initializers,
                                  input_shapes=training_data.shape,
                                  verbose=False, nesterov=True, number_of_initializations=1,
-                                 callbacks=["earlystopping"], output_activation='sigmoid', show_line=True,
+                                 callbacks=["earlystopping"], output_activation='sigmoid', show_line=False,
                                  ).get_configs()
 
 length = len(myConfigurator)
-buckets = 100
+buckets = 10
 
 bucket = {}
 for i in range(buckets):
