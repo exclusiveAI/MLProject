@@ -134,7 +134,7 @@ class Composer:
         else:
             self.manyInitializers = False
         if len(activation_functions) - 1 > 1:
-            if len(activation_functions) != num_layers + 1:
+            if len(activation_functions) != num_layers:
                 print(activation_functions, num_layers, config)
                 raise ValueError("Parameter activation_functions must have the same length as num_layers")
             else:
