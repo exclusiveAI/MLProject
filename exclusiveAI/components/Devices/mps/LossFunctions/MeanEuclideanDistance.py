@@ -6,7 +6,7 @@ __all__ = ["MeanEuclideanDistance"]
 
 class MeanEuclideanDistance(LossFunction):
     """
-    Mean Euclidean Distance loss fucntion.
+    Mean Euclidean Distance loss function.
     """
     def __init__(self) -> None:
         super().__init__(

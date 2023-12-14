@@ -1,4 +1,3 @@
-from exclusiveAI.Composer import Composer
 from itertools import product
 from tqdm import tqdm
 import numpy as np
@@ -43,6 +42,7 @@ class ConfiguratorGen:
                  regularizations=None,
                  nesterov=False,
                  momentums=None,
+                 show_line=False,
                  max_configs=100,
                  verbose=False,
                  random=False,
@@ -91,7 +91,7 @@ class ConfiguratorGen:
 
         selected_configs = list(configurations)
 
-        with tqdm(total=len(selected_configs) * number_of_initializations, desc="2nd for", colour="white") as pbar:
+        with tqdm(total=len(selected_configs) * number_of_initializations, desc="2nd for", colour="white", disable=not show_line) as pbar:
             final_configs = []
             for config in selected_configs:
                 internal_config = list(config)
@@ -105,7 +105,7 @@ class ConfiguratorGen:
                 pbar.update(1)
 
         if number_of_initializations > 1:
-            with tqdm(total=len(final_configs) * number_of_initializations, desc="1st for", colour="white") as pbar:
+            with tqdm(total=len(final_configs) * number_of_initializations, desc="1st for", colour="white", disable=not show_line) as pbar:
                 tmp_configurations = []
                 for config in final_configs:
                     for i in range(number_of_initializations):
@@ -137,10 +137,8 @@ class ConfiguratorGen:
                   "initializers": config[8], "nesterov": True if config[9] == 'True' else False,
                   "input_shape": self.input_shapes, "callbacks": self.callbacks, "verbose": self.verbose,
                   "outputs": self.outputs, "model_name": 'Model' + str(self.current)}
-        composed_model = Composer(config=config)
-        model = composed_model.compose()
 
-        return model, config
+        return config
 
     def __iter__(self):
         return self
@@ -170,6 +168,19 @@ class ConfiguratorGen:
         tmp_units = units
         result = [list(x) for x in product(tmp_units, repeat=layers)]
         return result
+
+    def get_configs(self):
+        tmp_configs = []
+        for i, config in enumerate(self.configs):
+            t_config = {"regularization": config[0], "learning_rate": config[1], "loss_function": config[2],
+                        "activation_functions": list(config[7]), "output_activation": self.output_activation,
+                        "num_of_units": list(config[6]), "num_layers": config[5], "momentum": config[3],
+                        "optimizer": config[4],
+                        "initializers": config[8], "nesterov": True if config[9] == 'True' else False,
+                        "input_shape": self.input_shapes, "callbacks": self.callbacks, "verbose": self.verbose,
+                        "outputs": self.outputs, "model_name": 'Model' + str(i)}
+            tmp_configs.append(t_config)
+        return tmp_configs
 
     @staticmethod
     def activation_per_layer(activation_functions, layers):

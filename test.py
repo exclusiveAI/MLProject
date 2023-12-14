@@ -1,9 +1,9 @@
 from exclusiveAI.ConfiguratorGen import ConfiguratorGen
 from exclusiveAI.Composer import Composer
-from exclusiveAI.components.Validation import *
+from exclusiveAI.components.Validation.HoldOut import parallel_hold_out, hold_out
 from exclusiveAI.datasets.monk import read_monk1
 from exclusiveAI.utils import one_hot_encoding, plot_history
-from exclusiveAI.components.Initializers import *
+
 # from exclusiveAI.components import *
 # from exclusiveAI import neural_network
 # from exclusiveAI.components.Optimizers import *
@@ -60,36 +60,52 @@ train = one_hot_encoding(train)
 test = one_hot_encoding(test)
 
 # ea = EarlyStoppingCallback(patience_limit=50, restore_weights=False)
-values = list(np.arange(0.01, 0.5, 0.01))
-values2 = [0, 0.1]
-
-uniform = Uniform(low=-1, high=1)
+values = list(np.arange(0.1, 0.5, 0.01))
+values2 = [0]
 
 myConfigurator = ConfiguratorGen(random=False, learning_rates=values,
                                  loss_function=['mse'], optimizer=['sgd'],
                                  activation_functions=['sigmoid'],
-                                 number_of_units=[1, 2, 3, 4], number_of_layers=[1, 2],
-                                 momentums=[0.96, 0.97, 0.99], initializers=[uniform], input_shapes=train.shape,
-                                 verbose=False, nesterov=True,
+                                 number_of_units=[2, 3], number_of_layers=[1, 2],
+                                 momentums=[0.96, 0.8], initializers=["uniform"],
+                                 input_shapes=train.shape,
+                                 verbose=False, nesterov=True, number_of_initializations=1,
                                  callbacks=["earlystopping"], output_activation='sigmoid'
                                  )
+if __name__ == '__main__':
+    config = parallel_hold_out(configs=myConfigurator.get_configs(), training=train, training_target=train_label,
+                               epochs=250, batch_size=32)
+    print("Model found:", config)
+    model = Composer(config=config).compose()
+    print("Model 1 train")
+    model.train(train.copy(), train_label.copy(), epochs=250, batch_size=32)
 
-myVal = HoldOut(models=myConfigurator, input=train, target=train_label)
-config = myVal.hold_out(epochs=250, batch_size=128)
+    config2 = parallel_hold_out(configs=myConfigurator.get_configs(), training=train, training_target=train_label,
+                                epochs=250, batch_size=32)
+    print("Model2 found:", config2)
+    model2 = Composer(config=config2).compose()
+    print("Model 2 train")
+    model2.train(train.copy(), train_label.copy(), epochs=250, batch_size=32)
 
-model = Composer(config=config).compose()
+    config3 = parallel_hold_out(configs=myConfigurator.get_configs(), training=train, training_target=train_label,
+                                epochs=250, batch_size=32)
+    print("Model3 found:", config3)
+    model3 = Composer(config=config3).compose()
+    print("Model 3 train")
+    model3.train(train.copy(), train_label.copy(), epochs=250, batch_size=32)
 
-print("Model found:", config)
-model.train(train, train_label, epochs=500, batch_size=128)
-history_mse = model.history['mee']
-plot_history(lines={'mee': history_mse})
-res = model.evaluate(input=test, input_label=test_label)
+    history_mse = model.history['mee']
+    history_mse2 = model2.history['mee']
+    history_mse3 = model3.history['mee']
+    plot_history(lines={'mee1': history_mse, 'mee2': history_mse2, 'mee3': history_mse3})
+    res = model.evaluate(input=test, input_label=test_label)
+    res2 = model2.evaluate(input=test, input_label=test_label)
+    res3 = model3.evaluate(input=test, input_label=test_label)
+    print(res, res2, res3)
 
-print(res)
+    # prediction = model.predict(input=test)
 
-# prediction = model.predict(input=test)
+    # prediction = 1 if x > 0.5 else 0
+    # prediction = np.round(prediction)
 
-# prediction = 1 if x > 0.5 else 0
-# prediction = np.round(prediction)
-
-# confusion_matrix(prediction, test_label)
+    # confusion_matrix(prediction, test_label)
