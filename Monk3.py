@@ -27,7 +27,7 @@ myConfigurator = ConfiguratorGen(random=False, learning_rates=learning_rates, re
                                  ).get_configs()
 
 length = len(myConfigurator)
-buckets = 10
+buckets = 100
 
 bucket = {}
 for i in range(buckets):
@@ -42,6 +42,6 @@ if __name__ == '__main__':
             parallel_hold_out(bucket[i], training=training_data, training_target=training_labels, epochs=epochs,
                               batch_size=batch_size, all_models=True, num_models=500 // buckets))
 
-configs = pd.DataFrame(configs)
-# Save as json
-configs.to_json('monk3_models_configurations.json')
+    configs = pd.DataFrame(configs)
+    # Save as json
+    configs.to_json('monk3_models_configurations.json')
