@@ -1,7 +1,6 @@
 from itertools import product
 from tqdm import tqdm
 import numpy as np
-import pickle
 
 
 class ConfiguratorGen:
@@ -91,21 +90,23 @@ class ConfiguratorGen:
 
         selected_configs = list(configurations)
 
-        with tqdm(total=len(selected_configs) * number_of_initializations, desc="2nd for", colour="white", disable=not show_line) as pbar:
+        with tqdm(total=len(selected_configs) * number_of_initializations, desc="2nd for", colour="white",
+                  disable=not show_line) as pbar:
             final_configs = []
             for config in selected_configs:
                 internal_config = list(config)
                 num_layers = internal_config[5]
-                units = self.units_per_layer_combinations(self.number_of_units, num_layers)
-                activations = self.activation_per_layer(self.activation_functions, num_layers)
-                for activation in activations:
-                    for unit in units:
-                        local_config = internal_config[:6] + [unit, activation] + internal_config[6:]
-                        final_configs.append(local_config)
+                product_unit_activation = self.units_activations_per_layer_combinations(self.activation_functions,
+                                                                                        self.number_of_units,
+                                                                                        num_layers)
+                for unit, activation in product_unit_activation:
+                    local_config = internal_config[:6] + [unit, activation] + internal_config[6:]
+                    final_configs.append(local_config)
                 pbar.update(1)
 
         if number_of_initializations > 1:
-            with tqdm(total=len(final_configs) * number_of_initializations, desc="1st for", colour="white", disable=not show_line) as pbar:
+            with tqdm(total=len(final_configs) * number_of_initializations, desc="1st for", colour="white",
+                      disable=not show_line) as pbar:
                 tmp_configurations = []
                 for config in final_configs:
                     for i in range(number_of_initializations):
@@ -153,21 +154,13 @@ class ConfiguratorGen:
     def len(self):
         return self.max
 
-    def save(self, filename="configs.pkl"):
-        """
-        Save self.configs as a pickle file.
-
-        Args:
-            filename (str, optional): The name of the pickle file. Defaults to "configs.pkl".
-        """
-        with open(filename, 'wb') as file:
-            pickle.dump(self, file)
-
     @staticmethod
-    def units_per_layer_combinations(units, layers):
+    def units_activations_per_layer_combinations(activation_functions, units, layers):
         tmp_units = units
+        tmp_activations = activation_functions
         result = [list(x) for x in product(tmp_units, repeat=layers)]
-        return result
+        result2 = [list(x) for x in list(product(tmp_activations, repeat=layers))]
+        return product(result, result2)
 
     def get_configs(self):
         tmp_configs = []
@@ -181,9 +174,3 @@ class ConfiguratorGen:
                         "outputs": self.outputs, "model_name": 'Model' + str(i)}
             tmp_configs.append(t_config)
         return tmp_configs
-
-    @staticmethod
-    def activation_per_layer(activation_functions, layers):
-        tmp_activations = activation_functions
-        result = [list(x) for x in list(product(tmp_activations, repeat=layers))]
-        return result
