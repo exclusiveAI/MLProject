@@ -1,7 +1,7 @@
 from exclusiveAI.utils import train_split
 from exclusiveAI.Composer import Composer
 from tqdm import tqdm
-from concurrent.futures import ProcessPoolExecutor
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 from functools import partial
 
 __all__ = ['parallel_hold_out', "hold_out"]
@@ -55,7 +55,7 @@ def evaluate_model(config, train, train_target, validation, validation_target, a
 
 
 def parallel_hold_out(configs, training, training_target, metric=None, all_models=False, eps=1e-2, num_models=100,
-                      epochs=100, batch_size=32, disable_line=True, workers=None, assessment=False):
+                      epochs=100, batch_size=32, disable_line=True, workers=None, assessment=False, prefer=''):
     metric = 'val_mse' if assessment else 'mse' if metric is None else metric
     train, train_target, validation, validation_target = split(training, training_target)
 
@@ -64,9 +64,14 @@ def parallel_hold_out(configs, training, training_target, metric=None, all_model
                                assessment=assessment, disable_line=disable_line,
                                batch_size=batch_size, epochs=epochs)
 
-    with ProcessPoolExecutor(max_workers=workers) as executor:
-        results = list(tqdm(executor.map(evaluate_partial, configs),
-                            total=len(configs), desc="Models", colour="white"))
+    if prefer.lower() == "threads":
+        with ThreadPoolExecutor(max_workers=workers) as executor:
+            results = list(tqdm(executor.map(evaluate_partial, configs),
+                                total=len(configs), desc="Models", colour="white"))
+    else:
+        with ProcessPoolExecutor(max_workers=workers) as executor:
+            results = list(tqdm(executor.map(evaluate_partial, configs),
+                                total=len(configs), desc="Models", colour="white"))
 
     best_models, best_configs = get_best_model(results, all_models, metric, eps, num_models)
 
