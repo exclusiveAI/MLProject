@@ -5,7 +5,7 @@ from exclusiveAI.components.Validation.HoldOut import parallel_hold_out, hold_ou
 import pandas as pd
 import numpy as np
 
-training_data, training_labels, test_data, test_labels = read_monk1("../exclusiveAI/datasets/")
+training_data, training_labels, test_data, test_labels = read_monk1("../../exclusiveAI/datasets/")
 training_data = one_hot_encoding(training_data)
 test_data = one_hot_encoding(test_data)
 regularizations = np.arange(0, 0.11, 0.1).tolist()

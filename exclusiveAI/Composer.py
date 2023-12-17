@@ -176,7 +176,7 @@ class Composer:
         self.output_units = outputs
         self.verbose = verbose
 
-    def compose(self, regression: bool = False):
+    def compose(self, regression: bool = False) -> NeuralNetwork.NeuralNetwork:
         """
         Compose the building block to build the model.
         Returns:
