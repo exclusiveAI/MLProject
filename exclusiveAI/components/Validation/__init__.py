@@ -1,3 +1,3 @@
-from .KFoldCrossValidation import KFoldCrossValidation
-from .DoubleKFoldCrossValidation import DoubleKFoldCrossValidation
+from .KFoldCrossValidation import *
+from .ValidationUtils import *
 from .HoldOut import *

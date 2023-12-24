@@ -122,12 +122,13 @@ class NeuralNetwork:
             pbar.close()
         return self.history
 
-    def get_last(self):
+    def get_last(self, index=-1):
         """
         Get the last element of the history.
         Returns: the last element of the history.
         """
-        return {name: self.history[name][-1] for name in self.history}
+
+        return {name: self.history[name][index] for name in self.history}
 
     def predict(self, input: np.array):
         """
@@ -145,18 +146,20 @@ class NeuralNetwork:
             input = output
         return output
 
-    def evaluate(self, input: np.array, input_label: np.array):
+    def evaluate(self, input: np.array, input_label: np.array, metrics=None):
         """
         Apply the predict and calculate the metrics on prediction.
         Args:
             input: input data
             input_label: input label
+            metrics: metrics to calculate
 
         Returns: metrics on prediction
         """
+        if metrics is None:
+            metrics = ['mse', 'binary_accuracy']
         output = self.predict(input)
-        return MetricUtils.calculate('mse', target=input_label, predicted=output), MetricUtils.calculate(
-            'binary_accuracy', target=input_label, predicted=output)
+        return [MetricUtils.calculate(metric, target=input_label, predicted=output) for metric in metrics]
 
     def get_weights(self):
         weights = []
