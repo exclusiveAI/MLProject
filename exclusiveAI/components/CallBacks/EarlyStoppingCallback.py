@@ -46,6 +46,8 @@ class EarlyStoppingCallback:
             model.early_stop = True
             if self.restore_weights:
                 model.set_weights(self.best_weights)
+                model.history = model.history[:self.best_epoch]
+                model.curr_epoch = self.best_epoch
 
     def reset(self):
         self.best_loss = float('inf')
