@@ -9,8 +9,8 @@ __all__ = [
 ]
 
 
-def read_cup_training_dataset():
-    training_set_filepath = f"exclusiveAI/datasets/ML-CUP23-TR.csv"
+def read_cup_training_dataset(path="exclusiveAI/datasets"):
+    training_set_filepath = f"{path}/ML-CUP23-TR.csv"
 
     training_set_df = pd.read_csv(
         training_set_filepath,
@@ -37,7 +37,10 @@ def train_val_test_split(training_set_df, training_set_labels, train_size=0.7, t
                                                                                 tmp_labels,
                                                                                 split_size=test_size)
 
-    return train_set, train_labels, val_set, val_labels, test_set, test_labels, tmp_idx[test_idx]
+    return (train_set, train_labels,
+            val_set, val_labels, test_set,
+            test_labels, train_idx,
+            tmp_idx[val_idx], tmp_idx[test_idx])
 
 
 def read_cup_test_dataset():
