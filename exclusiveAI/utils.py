@@ -1,4 +1,4 @@
-__all__ = ['utils', 'train_split', 'confusion_matrix', 'one_hot_encoding', 'plot_history']
+__all__ = ['utils', 'train_split', 'one_hot_encoding', 'plot_history']
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -44,27 +44,8 @@ def train_split(inputs, input_label, split_size=0.2, shuffle=True, random_state=
         right_indices], left_indices, right_indices
 
 
-def confusion_matrix(predicted, target):
-    """
-    Compute the confusion matrix.
-    """
-    confusion = np.zeros((2, 2))
-    for i in range(len(predicted)):
-        j = round(predicted[i][0])
-        k = round(target[i][0])
-        confusion[j][k] += 1
-    plt.matshow(confusion, cmap=plt.cm.Blues)
-    # print num of element in the matrix
-    for i in range(2):
-        for j in range(2):
-            plt.text(x=j, y=i, s=confusion[i][j], va='center', ha='center')
-    plt.colorbar()
-    plt.ylabel('True label')
-    plt.xlabel('Predicted label')
-    plt.savefig('res.png')
-
-
-def plot_history(lines: dict):
+def plot_history(lines: dict, fig_size=(10, 6)):
+    plt.figure(figsize=fig_size)
     for elem in lines:
         plt.plot(lines[elem], label=elem)
     plt.legend()

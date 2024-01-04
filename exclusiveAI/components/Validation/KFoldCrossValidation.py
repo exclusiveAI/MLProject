@@ -1,4 +1,4 @@
-from concurrent.futures import ProcessPoolExecutor
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 import numpy as np
 from exclusiveAI.Composer import Composer
 from .ValidationUtils import get_best_model
@@ -52,15 +52,15 @@ def split(x, y_true=None, random_state=None, shuffle=True, n_splits=5):
 
 
 def validate_single_config(config, x, y_true, epochs, batch_size, disable_line, random_state, shuffle, n_splits,
-                           metric):
+                           metric, regression):
     best = None
     score = 0
     std = 0
     for train_index, val_index in split(x, y_true, random_state, shuffle, n_splits):
         x_train, x_val = x[train_index], x[val_index]
         y_train, y_val = y_true[train_index], y_true[val_index]
-        model = Composer(config=config).compose()
-        model.train(x_train, y_train, x_val, y_val, disable_line=disable_line, epochs=epochs, batch_size=batch_size)
+        model = Composer(config=config).compose(regression)
+        model.train(inputs=x_train, input_label=y_train, val=x_val, val_labels=y_val, disable_line=disable_line, epochs=epochs, batch_size=batch_size)
         if best is None or best.get_last()[metric] < model.get_last()[metric]:
             best = model
             score = model.get_last()[metric]
@@ -69,10 +69,11 @@ def validate_single_config(config, x, y_true, epochs, batch_size, disable_line, 
 
 
 def validate(configs, x, y_true, metric='val_mse', max_configs=1, random_state=None, shuffle=True, n_splits=5,
-             epochs=100, assessment=False, batch_size=32, disable_line=True, eps=1e-2, workers=None):
+             epochs=100, assessment=False, batch_size=32, disable_line=True, eps=1e-2, workers=None, regression=False):
+
     evaluate_partial = partial(validate_single_config, x=x, y_true=y_true, disable_line=disable_line,
                                batch_size=batch_size, epochs=epochs, random_state=random_state, shuffle=shuffle,
-                               n_splits=n_splits, metric=metric)
+                               n_splits=n_splits, metric=metric, regression=regression)
 
     with ProcessPoolExecutor(max_workers=workers) as executor:
         results = list(tqdm(executor.map(evaluate_partial, configs),
@@ -87,7 +88,7 @@ def validate(configs, x, y_true, metric='val_mse', max_configs=1, random_state=N
 
 def double_validate(configs, x, y_true, metric='val_mse', inner_splits=4, random_state=None,
                     shuffle=True, n_splits=5,
-                    epochs=100,
+                    epochs=100, regression=False,
                     batch_size=32, disable_line=True, eps=1e-2, workers=None):
     """
     Perform a double k-fold cross validation
@@ -102,6 +103,7 @@ def double_validate(configs, x, y_true, metric='val_mse', inner_splits=4, random
         n_splits (int): Number of splits
         random_state (int): random seed
         epochs (int): number of epochs to train the model
+        regression (bool): true if you want to use a regression model
         batch_size (int): batch size
         disable_line (bool): whether to disable line
         eps (float): epsilon for model dimension selection
@@ -120,9 +122,9 @@ def double_validate(configs, x, y_true, metric='val_mse', inner_splits=4, random
         my_config = validate(configs, x=x_train, y_true=y_train, metric=metric, random_state=random_state,
                              shuffle=False,
                              n_splits=inner_splits,
-                             epochs=epochs, batch_size=batch_size, disable_line=disable_line, eps=eps,
+                             epochs=epochs, batch_size=batch_size, disable_line=disable_line, eps=eps, regression=regression,
                              workers=workers)
-        model = Composer(config=my_config).compose()
+        model = Composer(config=my_config).compose(regression)
         model.train(x_train, y_train, epochs=epochs, batch_size=batch_size, disable_line=disable_line)
         # test error for each external split
         outer_scores.append(model.evaluate(x_test, y_test)[0])

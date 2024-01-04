@@ -1,6 +1,8 @@
 from itertools import product
 from tqdm import tqdm
 import numpy as np
+from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
+from functools import partial
 
 
 class ConfiguratorGen:
@@ -90,19 +92,22 @@ class ConfiguratorGen:
 
         selected_configs = list(configurations)
 
-        with tqdm(total=len(selected_configs) * number_of_initializations, desc="2nd for", colour="white",
-                  disable=not show_line) as pbar:
-            final_configs = []
-            for config in selected_configs:
-                internal_config = list(config)
-                num_layers = internal_config[5]
-                product_unit_activation = self.units_activations_per_layer_combinations(self.activation_functions,
-                                                                                        self.number_of_units,
-                                                                                        num_layers)
-                for unit, activation in product_unit_activation:
-                    local_config = internal_config[:6] + [unit, activation] + internal_config[6:]
-                    final_configs.append(local_config)
-                pbar.update(1)
+        final_configs = self.par_combinations(selected_configs, self.activation_functions, self.number_of_units,
+                                              self.output_activation, self.input_shapes, self.callbacks, self.verbose,
+                                              self.outputs)
+        # with tqdm(total=len(selected_configs) * number_of_initializations, desc="2nd for", colour="white",
+        #           disable=not show_line) as pbar:
+        #     final_configs = []
+        #     for config in selected_configs:
+        #         internal_config = list(config)
+        #         num_layers = internal_config[5]
+        #         product_unit_activation = self.units_activations_per_layer_combinations(self.activation_functions,
+        #                                                                                 self.number_of_units,
+        #                                                                                 num_layers)
+        #         for unit, activation in product_unit_activation:
+        #             local_config = internal_config[:6] + [unit, activation] + internal_config[6:]
+        #             final_configs.append(local_config)
+        #         pbar.update(1)
 
         if number_of_initializations > 1:
             with tqdm(total=len(final_configs) * number_of_initializations, desc="1st for", colour="white",
@@ -123,6 +128,57 @@ class ConfiguratorGen:
         self.current = -1
         self.max = max(max_configs, len(self.configs)) if self.type == 'random' else len(self.configs)
 
+    @staticmethod
+    def add_units_activations(config, activation_functions, number_of_units, pbar):
+        final_configs = []
+        internal_config = list(config)
+        num_layers = internal_config[5]
+        product_unit_activation = ConfiguratorGen.units_activations_per_layer_combinations(activation_functions,
+                                                                                           number_of_units,
+                                                                                           num_layers)
+        for unit, activation in product_unit_activation:
+            local_config = internal_config[:6] + [unit, activation] + internal_config[6:]
+            final_configs.append(local_config)
+        pbar.update(1)
+        return final_configs
+
+    @staticmethod
+    def par_combinations(selected_configs, activation_functions, number_of_units,
+                         output_activation, input_shapes, callbacks, verbose, outputs):
+
+        batch_size = 1000  # You can adjust the batch size based on your requirements
+        with tqdm(total=len(selected_configs), desc="Appending") as pbar:
+            with ThreadPoolExecutor(max_workers=8) as executor:
+                batches = [selected_configs[i:i + batch_size] for i in range(0, len(selected_configs), batch_size)]
+
+                batch_results = []
+                for batch in batches:
+                    evaluate_partial_batch = partial(ConfiguratorGen.add_units_activations,
+                                                     activation_functions=activation_functions,
+                                                     number_of_units=number_of_units, pbar=pbar)
+                    batch_results.append(executor.map(evaluate_partial_batch, batch))
+
+        output = []
+        counter = 0
+        final_configs = []
+        for batch in batch_results:
+            for element in batch:
+                for config in element:
+                    final_configs.append(config)
+        with tqdm(total=len(final_configs), desc="Appending") as pbar:
+            for config in final_configs:
+                config = {"regularization": config[0], "learning_rate": config[1], "loss_function": config[2],
+                          "activation_functions": list(config[7]), "output_activation": output_activation,
+                          "num_of_units": list(config[6]), "num_layers": config[5], "momentum": config[3],
+                          "optimizer": config[4],
+                          "initializers": config[8], "nesterov": True if config[9] == 'True' else False,
+                          "input_shape": input_shapes, "callbacks": callbacks, "verbose": verbose,
+                          "outputs": outputs, "model_name": 'Model' + str(counter)}
+                output.append(config)
+                counter += 1
+                pbar.update(1)
+        return output
+
     def next(self):
         """
         Returns: the next model/config in the list
@@ -131,13 +187,13 @@ class ConfiguratorGen:
         if self.verbose:
             print(f"Current configuration: {self.current} of {self.max}")
         config = self.configs[self.current]
-        config = {"regularization": config[0], "learning_rate": config[1], "loss_function": config[2],
-                  "activation_functions": list(config[7]), "output_activation": self.output_activation,
-                  "num_of_units": list(config[6]), "num_layers": config[5], "momentum": config[3],
-                  "optimizer": config[4],
-                  "initializers": config[8], "nesterov": True if config[9] == 'True' else False,
-                  "input_shape": self.input_shapes, "callbacks": self.callbacks, "verbose": self.verbose,
-                  "outputs": self.outputs, "model_name": 'Model' + str(self.current)}
+        # config = {"regularization": config[0], "learning_rate": config[1], "loss_function": config[2],
+        #           "activation_functions": list(config[7]), "output_activation": self.output_activation,
+        #           "num_of_units": list(config[6]), "num_layers": config[5], "momentum": config[3],
+        #           "optimizer": config[4],
+        #           "initializers": config[8], "nesterov": True if config[9] == 'True' else False,
+        #           "input_shape": self.input_shapes, "callbacks": self.callbacks, "verbose": self.verbose,
+        #           "outputs": self.outputs, "model_name": 'Model' + str(self.current)}
 
         return config
 
@@ -156,21 +212,18 @@ class ConfiguratorGen:
 
     @staticmethod
     def units_activations_per_layer_combinations(activation_functions, units, layers):
-        tmp_units = units
-        tmp_activations = activation_functions
-        result = [list(x) for x in product(tmp_units, repeat=layers)]
-        result2 = [list(x) for x in list(product(tmp_activations, repeat=layers))]
-        return product(result, result2)
+        return product(product(units, repeat=layers), product(activation_functions, repeat=layers))
 
     def get_configs(self):
-        tmp_configs = []
-        for i, config in enumerate(self.configs):
-            t_config = {"regularization": config[0], "learning_rate": config[1], "loss_function": config[2],
-                        "activation_functions": list(config[7]), "output_activation": self.output_activation,
-                        "num_of_units": list(config[6]), "num_layers": config[5], "momentum": config[3],
-                        "optimizer": config[4],
-                        "initializers": config[8], "nesterov": True if config[9] == 'True' else False,
-                        "input_shape": self.input_shapes, "callbacks": self.callbacks, "verbose": self.verbose,
-                        "outputs": self.outputs, "model_name": 'Model' + str(i)}
-            tmp_configs.append(t_config)
-        return tmp_configs
+        return self.configs
+        # tmp_configs = []
+        # for i, config in enumerate(self.configs):
+        #     t_config = {"regularization": config[0], "learning_rate": config[1], "loss_function": config[2],
+        #                 "activation_functions": list(config[7]), "output_activation": self.output_activation,
+        #                 "num_of_units": list(config[6]), "num_layers": config[5], "momentum": config[3],
+        #                 "optimizer": config[4],
+        #                 "initializers": config[8], "nesterov": True if config[9] == 'True' else False,
+        #                 "input_shape": self.input_shapes, "callbacks": self.callbacks, "verbose": self.verbose,
+        #                 "outputs": self.outputs, "model_name": 'Model' + str(i)}
+        #     tmp_configs.append(t_config)
+        # return tmp_configs
