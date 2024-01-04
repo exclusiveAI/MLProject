@@ -55,10 +55,12 @@ def add_to_history(model, y_train_pred, y_train_true, y_val_pred, y_val_true):
         y_val_true: corresponding target value
     """
     for metric in model.metrics:
-        y_train_true = y_train_true.reshape(-1, 1)
+        if y_train_true.shape == (y_train_true.shape[0],):
+            y_train_true = y_train_true.reshape(-1, 1)
         model.history[metric.name].append(metric(y_train_true, y_train_pred))
         if y_val_pred is not None and y_val_true is not None:
-            y_val_true = y_val_true.reshape(-1, 1)
+            if y_val_true.shape == (y_val_true.shape[0],):
+                y_val_true = y_val_true.reshape(-1, 1)
             model.history['val_' + metric.name].append(metric(y_val_true, y_val_pred))
 
 

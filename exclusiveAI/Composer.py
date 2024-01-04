@@ -83,22 +83,36 @@ class Composer:
                  config: {} = None,
                  ):
         if config is not None:
-            regularization = config.get('regularization', regularization)
-            learning_rate = config.get('learning_rate', learning_rate)
-            loss_function = config.get('loss_function', loss_function)
-            activation_functions = config.get('activation_functions', activation_functions)
-            output_activation = config.get('output_activation', output_activation)
-            num_of_units = config.get('num_of_units', num_of_units)
-            num_layers = config.get('num_layers', num_layers)
-            momentum = config.get('momentum', momentum)
-            optimizer = config.get('optimizer', optimizer)
-            initializers = config.get('initializers', initializers)
-            callbacks = config.get('callbacks', callbacks)
-            nesterov = config.get('nesterov', nesterov)
-            verbose = config.get('verbose', verbose)
-            outputs = config.get('outputs', outputs)
-            input_shape = config.get('input_shape', input_shape)
-            model_name = config.get('model_name', model_name)
+            if isinstance(config, dict):
+                regularization = config.get('regularization', regularization)
+                learning_rate = config.get('learning_rate', learning_rate)
+                loss_function = config.get('loss_function', loss_function)
+                activation_functions = config.get('activation_functions', activation_functions)
+                output_activation = config.get('output_activation', output_activation)
+                num_of_units = config.get('num_of_units', num_of_units)
+                num_layers = config.get('num_layers', num_layers)
+                momentum = config.get('momentum', momentum)
+                optimizer = config.get('optimizer', optimizer)
+                initializers = config.get('initializers', initializers)
+                callbacks = config.get('callbacks', callbacks)
+                nesterov = config.get('nesterov', nesterov)
+                verbose = config.get('verbose', verbose)
+                outputs = config.get('outputs', outputs)
+                input_shape = config.get('input_shape', input_shape)
+                model_name = config.get('model_name', model_name)
+            # else:
+            #     regularization = config[0]
+            #     learning_rate = config[1]
+            #     loss_function = config[2]
+            #     activation_functions = list(config[7])
+            #     output_activation = config
+            #     t_config = {"regularization": config[0], "learning_rate": config[1], "loss_function": config[2],
+            #                 "activation_functions": list(config[7]), "output_activation": self.output_activation,
+            #                 "num_of_units": list(config[6]), "num_layers": config[5], "momentum": config[3],
+            #                 "optimizer": config[4],
+            #                 "initializers": config[8], "nesterov": True if config[9] == 'True' else False,
+            #                 "input_shape": self.input_shapes, "callbacks": self.callbacks, "verbose": self.verbose,
+            #                 "outputs": self.outputs, "model_name": 'Model' + str(i)}
         if input_shape is None:
             # Error can't initialize
             raise ValueError("Parameter input_shape can't be None")
