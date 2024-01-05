@@ -52,28 +52,46 @@ def split(x, y_true=None, random_state=None, shuffle=True, n_splits=5):
 
 
 def validate_single_config(config, x, y_true, epochs, batch_size, disable_line, random_state, shuffle, n_splits,
-                           metric, regression):
+                           metric, regression, number_of_initializations):
     best = None
     score = 0
     std = 0
     for train_index, val_index in split(x, y_true, random_state, shuffle, n_splits):
         x_train, x_val = x[train_index], x[val_index]
         y_train, y_val = y_true[train_index], y_true[val_index]
-        model = Composer(config=config).compose(regression)
-        model.train(inputs=x_train, input_label=y_train, val=x_val, val_labels=y_val, disable_line=disable_line, epochs=epochs, batch_size=batch_size)
-        if best is None or best.get_last()[metric] < model.get_last()[metric]:
+
+        models = []
+        mean_model_score = 0
+        best_initialization_score = 0
+        best_model_initialization = None
+
+        for i in range(number_of_initializations):
+            models.append(Composer(config=config).compose(regression))
+            models[i].train(inputs=x_train, input_label=y_train, val=x_val, val_labels=y_val,
+                            disable_line=disable_line, epochs=epochs, batch_size=batch_size)
+            if best_initialization_score is None or best_initialization_score > models[i].get_last()[metric]:
+                best_initialization_score = models[i].get_last()[metric]
+                best_model_initialization = models[i]
+            mean_model_score += models[i].get_last()[metric]
+        mean_model_score /= number_of_initializations
+
+        model = best_model_initialization
+
+        if best is None or best.get_last()[metric] < mean_model_score:
             best = model
-            score = model.get_last()[metric]
+            score = mean_model_score
             std = np.std(model.history[metric])
     return score, std, best, config
 
 
-def validate(configs, x, y_true, metric='val_mse', max_configs=1, random_state=None, shuffle=True, n_splits=5,
-             epochs=100, assessment=False, batch_size=32, disable_line=True, eps=1e-2, workers=None, regression=False):
+def validate(configs, x, y_true, metric='val_mse', max_configs=1, random_state=None, shuffle=True,
+             n_splits=5, number_of_initializations=1, epochs=100, assessment=False, batch_size=32,
+             disable_line=True, eps=1e-2, workers=None, regression=False):
 
     evaluate_partial = partial(validate_single_config, x=x, y_true=y_true, disable_line=disable_line,
                                batch_size=batch_size, epochs=epochs, random_state=random_state, shuffle=shuffle,
-                               n_splits=n_splits, metric=metric, regression=regression)
+                               n_splits=n_splits, metric=metric, regression=regression,
+                               number_of_initializations=number_of_initializations)
 
     with ProcessPoolExecutor(max_workers=workers) as executor:
         results = list(tqdm(executor.map(evaluate_partial, configs),
@@ -87,7 +105,7 @@ def validate(configs, x, y_true, metric='val_mse', max_configs=1, random_state=N
 
 
 def double_validate(configs, x, y_true, metric='val_mse', inner_splits=4, random_state=None,
-                    shuffle=True, n_splits=5,
+                    shuffle=True, n_splits=5, number_of_initializations=1,
                     epochs=100, regression=False,
                     batch_size=32, disable_line=True, eps=1e-2, workers=None):
     """
@@ -98,9 +116,9 @@ def double_validate(configs, x, y_true, metric='val_mse', inner_splits=4, random
         y_true: the target
         metric: the metric to be used for the cross validation
         inner_splits: the number of splits for the cross validation
-        max_configs: the maximum number of configs to consider
         shuffle (bool): true if you want to shuffle the data
         n_splits (int): Number of splits
+        number_of_initializations (int): Number of initializations for each model
         random_state (int): random seed
         epochs (int): number of epochs to train the model
         regression (bool): true if you want to use a regression model
@@ -120,10 +138,9 @@ def double_validate(configs, x, y_true, metric='val_mse', inner_splits=4, random
         y_train, y_test = y_true[outer_train_index], y_true[outer_val_index]
 
         my_config = validate(configs, x=x_train, y_true=y_train, metric=metric, random_state=random_state,
-                             shuffle=False,
-                             n_splits=inner_splits,
-                             epochs=epochs, batch_size=batch_size, disable_line=disable_line, eps=eps, regression=regression,
-                             workers=workers)
+                             shuffle=False, number_of_initializations=number_of_initializations,
+                             n_splits=inner_splits, epochs=epochs, batch_size=batch_size, disable_line=disable_line,
+                             eps=eps, regression=regression, workers=workers)
         model = Composer(config=my_config).compose(regression)
         model.train(x_train, y_train, epochs=epochs, batch_size=batch_size, disable_line=disable_line)
         # test error for each external split

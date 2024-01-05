@@ -81,6 +81,8 @@ class NeuralNetwork:
         Returns: training history
 
         """
+
+        # cast array to float64
         # check if both val and val_label are provided
         if val is not None and val_labels is not None:
             # check if val and val_label have the same shape

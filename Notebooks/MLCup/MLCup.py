@@ -57,7 +57,7 @@ if __name__ == '__main__':
                                      number_of_units=number_of_units, number_of_layers=number_of_layers,
                                      momentums=momentums, initializers=initializers,
                                      input_shapes=training_data.shape,
-                                     verbose=False, nesterov=True, number_of_initializations=1, outputs=3,
+                                     verbose=False, nesterov=True, outputs=3,
                                      callbacks=["earlystopping"], output_activation='linear', show_line=False,
                                      ).get_configs()
 
@@ -74,12 +74,13 @@ if __name__ == '__main__':
         bucket[i] = myConfigurator[i * length // buckets:(i + 1) * length // buckets if i + 1 < buckets else length]
 
     batch_size = 200
-    epochs = 250
+    epochs = 500
     configs = []
     for i in range(buckets):
-        configs = validate(bucket[i], x=training_data, y_true=training_labels, metric='val_mse', max_configs=num_models,
-                           regression=True,
-                           n_splits=4, epochs=epochs, batch_size=batch_size, eps=1e-2, workers=4)
+        configs.append(
+            validate(bucket[i], x=training_data, y_true=training_labels, metric='val_mse', max_configs=num_models,
+                     regression=True,
+                     n_splits=4, epochs=epochs, batch_size=batch_size, eps=1e-2, workers=4))
         if buckets > 1:
             configs = pd.DataFrame(configs)
             # Save as json
