@@ -48,25 +48,41 @@ def split(training, training_target, split_size=0.2, shuffle=True, seed=42):
 
 
 def evaluate_model(config, train, train_target, validation, validation_target, assessment, disable_line, batch_size,
-                   epochs, metric):
-    model = Composer(config=config).compose()
-    model.train(train.copy(), train_target.copy(), None if assessment else validation.copy(),
-                None if assessment else validation_target.copy(), disable_line=disable_line,
-                epochs=epochs, batch_size=batch_size)
-    score = model.get_last()[metric]
+                   epochs, metric, regression, number_of_initializations):
+    models = []
+    mean_model_score = 0
+    best_initialization_score = None
+    best_model_initialization = None
+
+    for i in range(number_of_initializations):
+        models.append(Composer(config=config).compose(regression))
+        models[i].train(train.copy(), train_target.copy(), None if assessment else validation.copy(),
+                        None if assessment else validation_target.copy(), disable_line=disable_line,
+                        epochs=epochs, batch_size=batch_size)
+        if best_initialization_score is None or best_initialization_score > models[i].get_last()[metric]:
+            best_initialization_score = models[i].get_last()[metric]
+            best_model_initialization = models[i]
+        mean_model_score += models[i].get_last()[metric]
+    mean_model_score /= number_of_initializations
+
+    model = best_model_initialization
+
+    score = mean_model_score
     std = np.std(model.history[metric])
     return score, std, model, config
 
 
-def parallel_hold_out(configs, training, training_target, metric=None, eps=1e-2, num_models=1,
-                      epochs=100, batch_size=32, disable_line=True, workers=None, assessment=False, prefer=''):
+def parallel_hold_out(configs, training, training_target, metric=None, eps=1e-2, num_models=1, regression=False,
+                      number_of_initializations=1, epochs=100, batch_size=32,
+                      disable_line=True, workers=None, assessment=False, prefer=''):
     metric = 'val_mse' if not assessment else 'mse' if metric is None else metric
     train, train_target, validation, validation_target = split(training, training_target)
 
     evaluate_partial = partial(evaluate_model, train=train, train_target=train_target,
                                validation=validation, validation_target=validation_target,
                                assessment=assessment, disable_line=disable_line, metric=metric,
-                               batch_size=batch_size, epochs=epochs)
+                               batch_size=batch_size, epochs=epochs, regression=regression,
+                               number_of_initializations=number_of_initializations)
 
     if prefer.lower() == "threads":
         with ThreadPoolExecutor(max_workers=workers) as executor:
@@ -85,8 +101,9 @@ def parallel_hold_out(configs, training, training_target, metric=None, eps=1e-2,
     return best_models[0].evaluate(validation, validation_target)[0] if assessment else best_configs[0]
 
 
-def hold_out(configs, training, training_target, metric: str = None, epochs=100,
-             batch_size=32, disable_line=True, assessment=False, eps=1e-2, num_models=1):
+def hold_out(configs, training, training_target, metric: str = None, epochs=100, regression=False,
+             number_of_initializations=1, batch_size=32, disable_line=True, assessment=False,
+             eps=1e-2, num_models=1):
     """
     The hold out algorithm
     Args:
@@ -95,6 +112,8 @@ def hold_out(configs, training, training_target, metric: str = None, epochs=100,
         training_target: training target
         metric: metric to use (e.g, mse)
         epochs: number of epochs
+        regression (bool): whether to use regression or classification
+        number_of_initializations (int): number of initializations for each model
         batch_size: batch size
         disable_line: whether to disable the line of model training output
         assessment: whether to assess the model or make model selection
@@ -110,11 +129,27 @@ def hold_out(configs, training, training_target, metric: str = None, epochs=100,
     results = []
     with tqdm(total=len(configs), desc="Models", colour="white") as pbar:
         for config in configs:
-            model = Composer(config=config).compose()
-            model.train(train, train_target, None if assessment else validation,
-                        None if assessment else validation_target, disable_line=disable_line, epochs=epochs,
-                        batch_size=batch_size)
-            results.append((model, config))
+            models = []
+            mean_model_score = 0
+            best_initialization_score = 0
+            best_model_initialization = None
+
+            for i in range(number_of_initializations):
+                models.append(Composer(config=config).compose(regression))
+                models[i].train(train.copy(), train_target.copy(), None if assessment else validation.copy(),
+                                None if assessment else validation_target.copy(), disable_line=disable_line,
+                                epochs=epochs, batch_size=batch_size)
+                if best_initialization_score is None or best_initialization_score > models[i].get_last()[metric]:
+                    best_initialization_score = models[i].get_last()[metric]
+                    best_model_initialization = models[i]
+                mean_model_score += models[i].get_last()[metric]
+            mean_model_score /= number_of_initializations
+
+            model = best_model_initialization
+
+            score = mean_model_score
+            std = np.std(model.history[metric])
+            results.append((score, std, model, config))
             pbar.update(1)
     best_models, best_configs = get_best_model(results, eps, num_models)
     if num_models > 1:

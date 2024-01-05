@@ -10,7 +10,7 @@ def get_best_model(results, eps, num_models):
 
     for score, std, model, config in tqdm(results, desc="Processing models", unit="model", leave=False):
         for i, ith_model in enumerate(best_models):
-            if score < ith_model[1] or (abs(score - ith_model[1]) < eps and compare_model_dim(model, ith_model[3]) < 0):
+            if score < ith_model[1]:# or (abs(score - ith_model[1]) < eps and compare_model_dim(model, ith_model[3]) < 0):
                 best_models.insert(i, (std, score, model_dim(model), model, config))
                 break
 
