@@ -18,8 +18,8 @@ class Sigmoid(ActivationFunction):
 
     @staticmethod
     def function(x):
-        return np.ones(x.shape, dtype=np.longdouble) / (np.ones(x.shape, dtype=np.longdouble) + np.exp(-x, dtype=np.longdouble))
+        return np.ones(x.shape) / (np.ones(x.shape) + np.exp(-x))
 
     @staticmethod
     def derivative(x):
-        return Sigmoid.function(x) * (np.ones(x.shape, dtype=np.longdouble) - Sigmoid.function(x))
+        return Sigmoid.function(x) * (np.ones(x.shape) - Sigmoid.function(x))
