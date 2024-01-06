@@ -17,8 +17,8 @@ class Tanh(ActivationFunction):
 
     @staticmethod
     def function(x):
-        return (np.exp(x, dtype=np.float64) - np.exp(-x, dtype=np.float64)) / (np.exp(x, dtype=np.float64) + np.exp(-x, dtype=np.float64))
+        return (np.exp(x) - np.exp(-x)) / (np.exp(x) + np.exp(-x))
 
     @staticmethod
     def derivative(x):
-        return np.ones(shape=x.shape, dtype=np.float64) - np.square(Tanh.function(x), dtype=np.float64)
+        return np.ones(shape=x.shape) - np.square(Tanh.function(x))

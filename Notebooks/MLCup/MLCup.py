@@ -43,8 +43,8 @@ else:
 regularizations = [0.0, 1e-8, 1e-7, 1e-6, 1e-5, 1e-4]
 learning_rates = np.arange(0.2, 1, 0.1).tolist()
 learning_rates = [round(value, 2) for value in learning_rates]
-number_of_units = [5, 10, 15, 20]
-number_of_layers = [1, 2, 3]
+number_of_units = [10, 15, 20]
+number_of_layers = [2, 3]
 initializers = ["uniform", "gaussian"]
 momentums = np.arange(0.5, 1, 0.1).tolist()
 momentums = [round(value, 2) for value in momentums]
@@ -68,7 +68,7 @@ if __name__ == '__main__':
         buckets = buckets + 1
     if buckets > 1:
         print(f"Buckets: {buckets}, Bucket size: ", length // buckets)
-    num_models = int(2000 / buckets) + 1
+    num_models = 2000
     bucket = {}
     for i in range(buckets):
         bucket[i] = myConfigurator[i * length // buckets:(i + 1) * length // buckets if i + 1 < buckets else length]
@@ -80,7 +80,7 @@ if __name__ == '__main__':
         configs.append(
             validate(bucket[i], x=training_data, y_true=training_labels, metric='val_mse', max_configs=num_models,
                      regression=True,
-                     n_splits=4, epochs=epochs, batch_size=batch_size, eps=1e-2, workers=4))
+                     n_splits=4, epochs=epochs, batch_size=batch_size, eps=1e-2, workers=8))
         if buckets > 1:
             configs = pd.DataFrame(configs)
             # Save as json
