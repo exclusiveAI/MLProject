@@ -9,11 +9,11 @@ training_data, training_labels, test_data, test_labels = read_monk3("../../exclu
 training_data = one_hot_encoding(training_data)
 test_data = one_hot_encoding(test_data)
 regularizations = [0.0, 1e-8, 1e-7, 1e-6, 1e-5, 1e-4]
-learning_rates = np.arange(0.1, 0.9, 0.01).tolist()
-number_of_units = list(range(1, 5, 1))
+learning_rates = np.arange(0.2, 0.9, 0.01).tolist()
+number_of_units = list(range(2, 5, 1))
 number_of_layers = list(range(1, 3, 1))
 initializers = ["uniform", "gaussian"]
-momentums = np.arange(0.5, 0.99, 0.01).tolist()
+momentums = np.arange(0.5, 1, 0.1).tolist()
 momentums.insert(0, 0)
 activations = ["sigmoid"]
 

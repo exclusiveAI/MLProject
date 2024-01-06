@@ -62,7 +62,7 @@ def validate_single_config(config, x, y_true, epochs, batch_size, disable_line, 
 
         models = []
         mean_model_score = 0
-        best_initialization_score = 0
+        best_initialization_score = None
         best_model_initialization = None
 
         for i in range(number_of_initializations):
