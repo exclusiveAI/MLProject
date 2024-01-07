@@ -13,4 +13,4 @@ class MSE(Metric):
 
     @staticmethod
     def function(y_pred, y_true):
-        return np.mean(np.sum(np.square(y_pred - y_true), axis=1))
+        return np.mean(np.sum(np.square(y_pred - y_true, dtype='float32'), axis=1, dtype='float32'), dtype='float32')

@@ -17,7 +17,7 @@ class MeanSquaredError(LossFunction):
 
     @staticmethod
     def function(y_true, y_pred):
-        return np.mean(np.sum(np.square(y_true-y_pred), axis=1))
+        return np.mean(np.sum(np.square(y_true-y_pred, dtype='float32'), axis=1, dtype='float32'), dtype='float32')
 
     @staticmethod
     def derivative(y_true, y_pred):

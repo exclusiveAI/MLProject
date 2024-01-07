@@ -1,5 +1,5 @@
-from exclusiveAI.components.Layers.Layer import Layer
-from exclusiveAI.components.ActivationFunctions import Linear
+from .Layer import Layer
+from ..ActivationFunctions import Linear
 from exclusiveAI.components.Initializers import *
 import mlx.core as mps
 import numpy as np

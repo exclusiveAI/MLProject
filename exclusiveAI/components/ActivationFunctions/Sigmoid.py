@@ -18,7 +18,7 @@ class Sigmoid(ActivationFunction):
 
     @staticmethod
     def function(x):
-        return np.ones(x.shape) / (np.ones(x.shape) + np.exp(-x))
+        return np.ones(x.shape) / (np.ones(x.shape) + np.exp(-x, dtype='float32'))
 
     @staticmethod
     def derivative(x):
