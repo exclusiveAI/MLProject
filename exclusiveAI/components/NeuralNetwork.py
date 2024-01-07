@@ -49,6 +49,11 @@ class NeuralNetwork:
         self.history = {}
         self.shuffle = shuffle
 
+        self.best_loss = float('inf')
+        self.best_weights = None
+        self.best_epoch = 0
+        self.patience = 0
+
         self.initialize()
 
     def initialize(self):

@@ -15,7 +15,7 @@ class Uniform(Initializer):
         low (float): Lower bound of the uniform distribution.
         high (float): Upper bound of the uniform distribution.
     """
-    def __init__(self, low=-1, high=1):
+    def __init__(self, low=-0.5, high=0.5):
         super().__init__(name='Uniform')
         self.low = low
         self.high = high

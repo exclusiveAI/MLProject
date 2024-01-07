@@ -138,7 +138,7 @@ class Layer:
         next_weights = self.next.weights[1:, :].T
 
         # calculate the product between the error signal and incoming weights from current unit
-        self.error = self.next.error @ next_weights
+        self.error = np.matmul(self.next.error, next_weights, dtype=np.longdouble)
         self.error = self.error * self.activation_func.derivative(self.nets)
 
         res = np.dot(previous_output.T, self.error)

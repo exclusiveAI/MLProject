@@ -8,12 +8,12 @@ import numpy as np
 training_data, training_labels, test_data, test_labels = read_monk1("../../exclusiveAI/datasets/")
 training_data = one_hot_encoding(training_data)
 test_data = one_hot_encoding(test_data)
-regularizations = np.arange(0, 0.11, 0.1).tolist()
-learning_rates = np.arange(0.1, 0.9, 0.01).tolist()
-number_of_units = list(range(1, 5, 1))
+regularizations = [0, 1e-7]
+learning_rates = np.arange(0.1, 0.9, 0.1).tolist()
+number_of_units = list(range(2, 5, 1))
 number_of_layers = list(range(1, 2, 1))
 initializers = ["uniform", "gaussian"]
-momentums = np.arange(0.5, 0.99, 0.01).tolist()
+momentums = np.arange(0, 0.9, 0.1).tolist()
 momentums.insert(0, 0)
 activations = ["sigmoid"]
 
@@ -55,4 +55,4 @@ if __name__ == '__main__':
 
     configs = pd.DataFrame(configs)
     # Save as json
-    configs.to_json('monk1_models_configurations_test2.json')
+    configs.to_json('monk1_models_configurations_test1.json')

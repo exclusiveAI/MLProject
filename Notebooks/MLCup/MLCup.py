@@ -7,10 +7,10 @@ import numpy as np
 import os
 import json
 
-file_path = "Data/training_data_split.json"
+file_path = "Notebooks/MLCup/Data/training_data_split.json"
 
 if not os.path.exists(file_path):
-    training_data, training_labels = read_cup_training_dataset("../../exclusiveAI/datasets/")
+    training_data, training_labels = read_cup_training_dataset("exclusiveAI/datasets/")
     training_data, training_labels, test_data, test_labels, train_idx, test_idx = train_split(training_data,
                                                                                               training_labels,
                                                                                               shuffle=True,
@@ -40,13 +40,12 @@ else:
     train_idx = np.array(data_dict['train_idx'])
     test_idx = np.array(data_dict['test_idx'])
 
-regularizations = [0.0, 1e-8, 1e-7, 1e-6, 1e-5, 1e-4]
-learning_rates = np.arange(0.2, 1, 0.1).tolist()
-learning_rates = [round(value, 2) for value in learning_rates]
+regularizations = [1e-8, 1e-7, 1e-6]
+learning_rates = np.arange(0.02, 0.06, 0.01)
 number_of_units = [10, 15, 20]
 number_of_layers = [2, 3]
 initializers = ["uniform", "gaussian"]
-momentums = np.arange(0.5, 1, 0.1).tolist()
+momentums = np.arange(0.1, 0.6, 0.1).tolist()
 momentums = [round(value, 2) for value in momentums]
 activations = ["sigmoid", "tanh"]
 if __name__ == '__main__':
@@ -74,7 +73,7 @@ if __name__ == '__main__':
         bucket[i] = myConfigurator[i * length // buckets:(i + 1) * length // buckets if i + 1 < buckets else length]
 
     batch_size = 200
-    epochs = 500
+    epochs = 100
     configs = []
     for i in range(buckets):
         configs.append(

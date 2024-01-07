@@ -15,4 +15,4 @@ class MEE(Metric):
 
     @staticmethod
     def function(y_true, y_pred):
-        return np.mean((np.linalg.norm(y_true - y_pred, axis=1)))
+        return np.mean((np.linalg.norm(y_true - y_pred, axis=1)), dtype='float32')

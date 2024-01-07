@@ -86,7 +86,7 @@ def validate_single_config(config, x, y_true, epochs, batch_size, disable_line, 
 
 def validate(configs, x, y_true, metric='val_mse', max_configs=1, random_state=None, shuffle=True,
              n_splits=5, number_of_initializations=1, epochs=100, assessment=False, batch_size=32,
-             disable_line=True, eps=1e-2, workers=None, regression=False):
+             disable_line=True, eps=1e-2, workers=None, regression=False, return_models_history=False):
 
     evaluate_partial = partial(validate_single_config, x=x, y_true=y_true, disable_line=disable_line,
                                batch_size=batch_size, epochs=epochs, random_state=random_state, shuffle=shuffle,
@@ -99,6 +99,11 @@ def validate(configs, x, y_true, metric='val_mse', max_configs=1, random_state=N
 
     best_models, best_configs = get_best_model(results, eps, max_configs)
 
+    if return_models_history:
+        if max_configs > 1:
+            return [model.history for model in best_models], best_configs if not assessment else [model.get_last()[metric] for model in best_models]
+        return best_models[0].history, best_configs[0] if not assessment else best_models[0].get_last()[metric]
+
     if max_configs > 1:
         return best_configs if not assessment else [model.get_last()[metric] for model in best_models]
     return best_configs[0] if not assessment else best_models[0].get_last()[metric]
@@ -106,7 +111,7 @@ def validate(configs, x, y_true, metric='val_mse', max_configs=1, random_state=N
 
 def double_validate(configs, x, y_true, metric='val_mse', inner_splits=4, random_state=None,
                     shuffle=True, n_splits=5, number_of_initializations=1,
-                    epochs=100, regression=False,
+                    epochs=100, regression=False, return_models_history=False,
                     batch_size=32, disable_line=True, eps=1e-2, workers=None):
     """
     Perform a double k-fold cross validation
@@ -144,6 +149,9 @@ def double_validate(configs, x, y_true, metric='val_mse', inner_splits=4, random
         model = Composer(config=my_config).compose(regression)
         model.train(x_train, y_train, epochs=epochs, batch_size=batch_size, disable_line=disable_line)
         # test error for each external split
-        outer_scores.append(model.evaluate(x_test, y_test)[0])
+        if return_models_history:
+            outer_scores.append((model.history, model.evaluate(x_test, y_test)[0]))
+        else:
+            outer_scores.append(model.evaluate(x_test, y_test)[0])
 
     return np.mean(outer_scores), outer_scores
