@@ -1,7 +1,7 @@
 from exclusiveAI.ConfiguratorGen import ConfiguratorGen
 from exclusiveAI.Composer import Composer
 from exclusiveAI.components.Validation.HoldOut import parallel_hold_out, hold_out
-from exclusiveAI.datasets.monk import read_monk1
+from exclusiveAI.datasets.monk import read_monk2
 from exclusiveAI.utils import one_hot_encoding, plot_history
 
 # from exclusiveAI.components import *
@@ -54,37 +54,65 @@ import numpy as np
 # #
 # # print(res)
 
-train, train_label, test, test_label = read_monk1()
+train, train_label, test, test_label = read_monk2()
 
 train = one_hot_encoding(train)
 test = one_hot_encoding(test)
 
 # ea = EarlyStoppingCallback(patience_limit=50, restore_weights=False)
-values = list(np.arange(0.1, 0.5, 0.01))
-values2 = [0]
+values = list(np.arange(0.5, 0.9, 0.1))
+values2 = [1e-7, 0]
 
-myConfigurator = ConfiguratorGen(random=False, learning_rates=values,
+myConfigurator = ConfiguratorGen(random=False, learning_rates=values, regularizations=values2,
                                  loss_function=['mse'], optimizer=['sgd'],
                                  activation_functions=['sigmoid'],
-                                 number_of_units=[2, 3], number_of_layers=[1, 2],
-                                 momentums=[0.96, 0.8], initializers=["uniform"],
+                                 number_of_units=[2, 3, 4], number_of_layers=[1],
+                                 momentums=[0.96], initializers=["uniform"],
                                  input_shapes=train.shape,
-                                 verbose=False, nesterov=True, number_of_initializations=1,
+                                 verbose=False, nesterov=True,
                                  callbacks=["earlystopping"], output_activation='sigmoid'
-                                 )
+                                 ).get_configs()
 if __name__ == '__main__':
-    res = parallel_hold_out(configs=myConfigurator.get_configs(), training=train, training_target=train_label,
-                               epochs=250, batch_size=32, assessment=True)
-    # print("Model found:", config)
-    # model = Composer(config=config).compose()
-    # print("Model 1 train")
-    # model.train(train.copy(), train_label.copy(), epochs=250, batch_size=32)
-    #
-    # history_mse = model.history['mee']
-    # plot_history(lines={'mee1': history_mse })
-    # res = model.evaluate(input=test, input_label=test_label)
-    print(res)
+    configs = parallel_hold_out(configs=myConfigurator, training=train, training_target=train_label, num_models=3,
+                                epochs=200, batch_size=32, assessment=False, number_of_initializations=1)
+    configs2 = hold_out(configs=myConfigurator, training=train, training_target=train_label, num_models=3,
+                        epochs=200, batch_size=32, assessment=False, number_of_initializations=1)
 
+    configs3 = parallel_hold_out(configs=myConfigurator, training=train, training_target=train_label, num_models=3,
+                                 epochs=200, batch_size=32, workers=8, assessment=False, number_of_initializations=1)
+
+    config = configs[0]
+    config2 = configs2[0]
+    config3 = configs3[0]
+    print("Model found:", config)
+    model = Composer(config=config).compose()
+    print("Model 1 train")
+    model.train(train.copy(), train_label.copy(), epochs=200, batch_size=32)
+
+    history_mse = model.history['mee']
+    res = model.evaluate(input=test, input_label=test_label)
+
+    print("Model found:", config2)
+    model2 = Composer(config=config2).compose()
+    print("Model 2 train")
+    model2.train(train.copy(), train_label.copy(), epochs=200, batch_size=32)
+
+    history_mse2 = model2.history['mee']
+    res2 = model2.evaluate(input=test, input_label=test_label)
+
+    print("Model found:", config3)
+    model3 = Composer(config=config3).compose()
+    print("Model 3 train")
+    model3.train(train.copy(), train_label.copy(), epochs=200, batch_size=32)
+
+    history_mse3 = model3.history['mee']
+    plot_history(lines={'mee1': history_mse, 'mee2': history_mse2, 'mee3': history_mse3})
+    res3 = model3.evaluate(input=test, input_label=test_label)
+
+    print(res, res2, res3)
+    print(configs)
+    print(configs2)
+    print(configs3)
     # prediction = model.predict(input=test)
 
     # prediction = 1 if x > 0.5 else 0

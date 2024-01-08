@@ -8,14 +8,16 @@ import numpy as np
 training_data, training_labels, test_data, test_labels = read_monk1("../../exclusiveAI/datasets/")
 training_data = one_hot_encoding(training_data)
 test_data = one_hot_encoding(test_data)
-regularizations = [0, 1e-7]
+regularizations = [0, 1e-7, 1e-6]
 learning_rates = np.arange(0.1, 0.9, 0.1).tolist()
-number_of_units = list(range(2, 5, 1))
-number_of_layers = list(range(1, 2, 1))
+learning_rates.append(0.01)
+learning_rates = [round(value, 2) for value in learning_rates]
+number_of_units = list(range(1, 5, 1))
+number_of_layers = list(range(1, 3, 1))
 initializers = ["uniform", "gaussian"]
-momentums = np.arange(0, 0.9, 0.1).tolist()
-momentums.insert(0, 0)
-activations = ["sigmoid"]
+momentums = np.arange(0, 1, 0.1).tolist()
+momentums = [round(value, 2) for value in momentums]
+activations = ["sigmoid", "tanh"]
 
 myConfigurator = ConfiguratorGen(random=False, learning_rates=learning_rates, regularizations=regularizations,
                                  loss_function=['mse'], optimizer=['sgd'],
@@ -42,7 +44,7 @@ bucket = {}
 for i in range(buckets):
     bucket[i] = myConfigurator[i * length // buckets:(i + 1) * length // buckets if i + 1 < buckets else length]
 
-batch_size = 32
+batch_size = 64
 epochs = 500
 configs = []
 if __name__ == '__main__':
@@ -50,7 +52,8 @@ if __name__ == '__main__':
     for i in range(buckets):
         configs.append(
             parallel_hold_out(bucket[i], training=training_data, training_target=training_labels, epochs=epochs,
-                              batch_size=batch_size, num_models=int(num_models // buckets), workers=8, number_of_initializations=2,
+                              batch_size=batch_size, num_models=int(num_models // buckets), workers=8,
+                              number_of_initializations=2, return_models_history=True,
                               ))
 
     configs = pd.DataFrame(configs)

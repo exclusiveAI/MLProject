@@ -7,10 +7,10 @@ import numpy as np
 import os
 import json
 
-file_path = "Notebooks/MLCup/Data/training_data_split.json"
+file_path = "Data/training_data_split.json"
 
 if not os.path.exists(file_path):
-    training_data, training_labels = read_cup_training_dataset("exclusiveAI/datasets/")
+    training_data, training_labels = read_cup_training_dataset("../../exclusiveAI/datasets/")
     training_data, training_labels, test_data, test_labels, train_idx, test_idx = train_split(training_data,
                                                                                               training_labels,
                                                                                               shuffle=True,
@@ -40,12 +40,13 @@ else:
     train_idx = np.array(data_dict['train_idx'])
     test_idx = np.array(data_dict['test_idx'])
 
-regularizations = [1e-8, 1e-7, 1e-6]
-learning_rates = np.arange(0.02, 0.06, 0.01)
+regularizations = [1e-8, 1e-7, 0]
+learning_rates = [0.001, 0.005, 0.01, 0.05]
 number_of_units = [10, 15, 20]
 number_of_layers = [2, 3]
 initializers = ["uniform", "gaussian"]
-momentums = np.arange(0.1, 0.6, 0.1).tolist()
+momentums = np.arange(0.1, 0.6, 0.2).tolist()
+momentums.insert(0,0)
 momentums = [round(value, 2) for value in momentums]
 activations = ["sigmoid", "tanh"]
 if __name__ == '__main__':
@@ -78,9 +79,10 @@ if __name__ == '__main__':
     for i in range(buckets):
         configs.append(
             validate(bucket[i], x=training_data, y_true=training_labels, metric='val_mse', max_configs=num_models,
-                     regression=True,
-                     n_splits=4, epochs=epochs, batch_size=batch_size, eps=1e-2, workers=8))
+                     regression=True, return_models_history=True,
+                     n_splits=4, epochs=epochs, batch_size=batch_size))
         if buckets > 1:
+            # histories = pd.DataFrame(configs[0])
             configs = pd.DataFrame(configs)
             # Save as json
             configs.to_json(f'MLCup_1output_models_configurations_test_1_bucket_{i}.json')

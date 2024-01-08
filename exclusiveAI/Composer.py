@@ -162,7 +162,7 @@ class Composer:
         self.initializers = [InitializersNames[initializer.lower()]() if isinstance(initializer, str) else initializer
                              for initializer in initializers]
 
-        self.callbacks = [CallbacksNames[callback.lower()](run_name=model_name) if isinstance(callback, str) else callback
+        self.callbacks = [self.str_to_callback(callback, model_name)
                           for callback in callbacks]
 
         self.loss_function = LossFunctionsNames[loss_function.lower()]() \
@@ -172,7 +172,8 @@ class Composer:
                                      if isinstance(activation_function, str) else activation_function
                                      for activation_function in activation_functions]
 
-        self.output_activation = ActivationFunctionsNames[output_activation.lower()]() if isinstance(output_activation, str) else output_activation
+        self.output_activation = ActivationFunctionsNames[output_activation.lower()]() if isinstance(output_activation,
+                                                                                                     str) else output_activation
 
         self.optimizer = OptimizersNames[optimizer.lower()](regularization=regularization,
                                                             learning_rate=learning_rate,
@@ -208,8 +209,34 @@ class Composer:
 
         model = NeuralNetwork.NeuralNetwork(optimizer=self.optimizer,
                                             callbacks=self.callbacks,
-                                            metrics=['mse', 'mae', 'mee', 'binary_accuracy'] if not regression else ['mse', 'mae', 'mee'],
+                                            metrics=['mse', 'mae', 'mee', 'binary_accuracy'] if not regression else [
+                                                'mse', 'mae', 'mee'],
                                             layers=layers,
                                             verbose=self.verbose)
 
         return model
+
+    @staticmethod
+    def str_to_callback(callback, model_name):
+        if isinstance(callback, str):
+            if '_' in callback:
+                call = callback.split('_')
+                local_eps = 1e-4
+                patience_limit = 50
+                restore_weights = False
+                penalty = False
+                for i, arg in enumerate(call[1:]):
+                    if i == 0:
+                        local_eps = float(arg)
+                    elif i == 1:
+                        patience_limit = int(arg)
+                    elif i == 2:
+                        restore_weights = True if arg.lower() == 'true' else False
+                    elif i == 3:
+                        penalty = True if arg.lower() == 'true' else False
+                return CallbacksNames[call[0].lower()](run_name=model_name, eps=local_eps, penalty=penalty,
+                                                       patience_limit=patience_limit, restore_weights=restore_weights)
+            else:
+                return CallbacksNames[callback.lower()](run_name=model_name)
+        else:
+            return callback
