@@ -1,5 +1,5 @@
 import tensorflow as tf
-from keras.optimizers import SGD
+from keras.optimizers import Adam
 import numpy as np
 import json
 
@@ -21,7 +21,7 @@ model = tf.keras.Sequential([
     tf.keras.layers.Dense(units=3, activation='linear')
 ])
 
-model.compile(optimizer=SGD(learning_rate=0.005, nesterov=False, momentum=0.1, weight_decay=1e-8), loss='mean_squared_error', metrics=['mean_absolute_error'])
+model.compile(optimizer=Adam(learning_rate=0.005, nesterov=False, momentum=0.1, weight_decay=1e-8), loss='mean_squared_error', metrics=['mean_absolute_error'])
 model.fit(training_data, training_labels, epochs=1000, batch_size=200)
 res = model.evaluate(test_data, test_labels)
 model.save('model.h5')
