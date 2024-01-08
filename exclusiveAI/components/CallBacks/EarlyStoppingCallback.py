@@ -38,7 +38,7 @@ class EarlyStoppingCallback:
         else:
             model.patience += 1
             if self.penalty and model.best_loss - loss < 0:
-                model.patience += 5
+                model.patience += 1
 
         if model.patience > self.patience_limit:
             self.stop = True
