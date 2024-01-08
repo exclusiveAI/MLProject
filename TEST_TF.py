@@ -22,7 +22,7 @@ model = tf.keras.Sequential([
     tf.keras.layers.Dense(units=3, activation='linear')
 ])
 
-model.compile(optimizer=SGD(learning_rate=0.05, nesterov=True, momentum=0.5, weight_decay=1e-8), loss='mean_squared_error', metrics=['mean_absolute_error'])
+model.compile(optimizer=SGD(learning_rate=0.005, nesterov=True, momentum=0, weight_decay=1e-8), loss='mean_squared_error', metrics=['mean_absolute_error'])
 model.fit(training_data, training_labels, epochs=1000, batch_size=200)
 model.evaluate(test_data, test_labels)
 model.save('model.h5')
