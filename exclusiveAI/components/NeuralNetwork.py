@@ -1,3 +1,5 @@
+import pickle
+
 import numpy as np
 from exclusiveAI.components.Optimizers import Optimizer
 from exclusiveAI.components.Metrics import MetricUtils
@@ -177,3 +179,12 @@ class NeuralNetwork:
     def set_weights(self, weights: list):
         for layer, weight in zip(self.layers, weights):
             layer.set_weights(weight)
+
+    def save(self, filename: str):
+        with open(filename, 'wb') as f:
+            pickle.dump(self, f)
+
+    @staticmethod
+    def load(filename: str):
+        with open(filename, 'rb') as f:
+            return pickle.load(f)

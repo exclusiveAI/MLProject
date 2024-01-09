@@ -23,9 +23,9 @@ class Adam(Optimizer):
             
         new_mean = []
         new_var = []
-        for meani, varianci, deltai in zip(self.mean, self.variance, deltas):
+        for meani, variancei, deltai in zip(self.mean, self.variance, deltas):
             new_mean.append(self.beta1 * meani + (1 - self.beta1) * deltai)
-            new_var.append(self.beta2 * varianci + (1 - self.beta2) * deltai ** 2)
+            new_var.append(self.beta2 * variancei + (1 - self.beta2) * deltai ** 2)
         new_mean = [meani / (1 - self.beta1) for meani in new_mean]
         new_var = [variancei / (1 - self.beta2) for variancei in new_var]
         self.mean = new_mean
