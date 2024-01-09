@@ -47,6 +47,7 @@ class ConfiguratorGen:
                  max_configs=100,
                  verbose=False,
                  random=False,
+                 beta2=None,
                  outputs=1
                  ):
         """
@@ -76,19 +77,32 @@ class ConfiguratorGen:
         self.nesterov = ["True", "False"] if nesterov else ["False"]
         self.verbose = verbose
         self.outputs = outputs
+        self.beta2 = beta2
 
         self.type = 'random' if random else 'grid'
         self.num_of_configurations = max_configs
 
-        configurations = product(regularizations,
-                                 learning_rates,
-                                 loss_function,
-                                 momentums,
-                                 optimizer,
-                                 number_of_layers,
-                                 initializers,
-                                 self.nesterov,
-                                 )
+        if beta2:
+            configurations = product(regularizations,
+                                     learning_rates,
+                                     loss_function,
+                                     momentums,
+                                     optimizer,
+                                     number_of_layers,
+                                     initializers,
+                                     self.nesterov,
+                                     beta2
+                                     )
+        else:
+            configurations = product(regularizations,
+                                     learning_rates,
+                                     loss_function,
+                                     momentums,
+                                     optimizer,
+                                     number_of_layers,
+                                     initializers,
+                                     self.nesterov,
+                                     )
 
         selected_configs = list(configurations)
 
@@ -172,6 +186,7 @@ class ConfiguratorGen:
                           "num_of_units": list(config[6]), "num_layers": config[5], "momentum": config[3],
                           "optimizer": config[4],
                           "initializers": config[8], "nesterov": True if config[9] == 'True' else False,
+                          "beta2": config[10] if len(config)>10 else 0,
                           "input_shape": input_shapes, "callbacks": callbacks, "verbose": verbose,
                           "outputs": outputs, "model_name": 'Model' + str(counter)}
                 output.append(config)

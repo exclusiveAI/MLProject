@@ -43,8 +43,8 @@ def train_val_test_split(training_set_df, training_set_labels, train_size=0.7, t
             tmp_idx[val_idx], tmp_idx[test_idx])
 
 
-def read_cup_test_dataset():
-    test_set_filepath = f"exclusiveAI/datasets/ML-CUP23-TEST.csv"
+def read_cup_test_dataset(path='exclusiveAI/datasets'):
+    test_set_filepath = f"{path}/ML-CUP23-TS.csv"
 
     test_set_df = pd.read_csv(
         test_set_filepath,
