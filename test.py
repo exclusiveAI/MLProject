@@ -64,7 +64,7 @@ values = list(np.arange(0.5, 0.9, 0.1))
 values2 = [1e-7, 0]
 
 myConfigurator = ConfiguratorGen(random=False, learning_rates=values, regularizations=values2,
-                                 loss_function=['mse'], optimizer=['sgd'],
+                                 loss_function=['mse'], optimizer=['adam'],
                                  activation_functions=['sigmoid'],
                                  number_of_units=[2, 3, 4], number_of_layers=[1],
                                  momentums=[0.96], initializers=["uniform"],

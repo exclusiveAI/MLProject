@@ -40,13 +40,13 @@ else:
     train_idx = np.array(data_dict['train_idx'])
     test_idx = np.array(data_dict['test_idx'])
 
-regularizations = [1e-8, 1e-7, 0]
+regularizations = [1e-8, 1e-7, 1e-6, 1e-5, 1e-4, 0]
 learning_rates = [0.001, 0.005, 0.01, 0.05]
 number_of_units = [10, 15, 20]
 number_of_layers = [2, 3]
 initializers = ["uniform", "gaussian"]
 momentums = np.arange(0.1, 0.6, 0.2).tolist()
-momentums.insert(0,0)
+momentums.insert(0, 0)
 momentums = [round(value, 2) for value in momentums]
 activations = ["sigmoid", "tanh"]
 if __name__ == '__main__':
