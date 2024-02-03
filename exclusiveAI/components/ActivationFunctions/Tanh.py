@@ -2,7 +2,7 @@ import numpy as np
 from .ActivationFunction import ActivationFunction
 
 __all__ = ["Tanh"]
-
+np.seterr(divide='ignore', invalid='ignore')
 
 class Tanh(ActivationFunction):
     """
